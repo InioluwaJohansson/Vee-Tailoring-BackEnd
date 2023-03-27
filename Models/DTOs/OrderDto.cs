@@ -38,6 +38,7 @@ namespace V_Tailoring.Models.DTOs
         public GetStaffDto GetStaffDto { get; set; }
         public string CompletionTime { get; set; }
         public string OtherDetails { get; set; }
+        public string ReferenceNumber { get; set; }
         public IsCompleted IsCompleted { get; set; }
         public IsPaid IsPaid { get; set; }
         public bool IsAssigned { get; set; }

@@ -42,19 +42,6 @@ namespace V_Tailoring.Controllers
         }
 
         // PUT : AddRemoveFromCart
-        [HttpPut("UpdatePayment")]
-        public async Task<IActionResult> UpdatePayment(int id)
-        {
-            int customerId = id;
-            var order = await _orderService.UpdatePayment(customerId);
-            if (order.Status == true)
-            {
-                return Ok(order);
-            }
-            return BadRequest(order);
-        }
-
-        // PUT : AddRemoveFromCart
         [HttpPut("AddRemoveFromCart")]
         public async Task<IActionResult> AddRemoveFromCart(int id)
         {

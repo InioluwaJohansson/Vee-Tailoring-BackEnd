@@ -31,6 +31,7 @@ namespace V_Tailoring.Entities
         public Staff Staff { get; set; }
         public int StaffId { get; set; }
         public string OtherDetails { get; set; }
+        public string ReferenceNumber { get; set; } = "";
         public DateTime CompletionTime { get; set; }
         public IsCompleted IsCompleted { get; set; }
         public IsPaid IsPaid { get; set; }

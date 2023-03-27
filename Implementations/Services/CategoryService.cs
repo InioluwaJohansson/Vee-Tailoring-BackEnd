@@ -65,8 +65,8 @@ namespace V_Tailoring.Implementations.Services
             return new CategoryResponseModel()
             {
                 Data = null,
-                Message = "Unable TO Retieve Category Successfully",
-                Status = true
+                Message = "Unable To Retieve Category Successfully",
+                Status = false
             };
         }
 

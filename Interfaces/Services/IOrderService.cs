@@ -1,5 +1,6 @@
 ﻿using V_Tailoring.Models.DTOs;
 using V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.DTOs;
 
 namespace V_Tailoring.Interface.Services
 {
@@ -7,7 +8,7 @@ namespace V_Tailoring.Interface.Services
     {
         Task<BaseResponse> Create(CreateOrderDto createOrderDto);
         Task<BaseResponse> Update(int id, UpdateOrderDto updateOrderDto);
-        Task<BaseResponse> UpdatePayment(int id);
+        Task<BaseResponse> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment);
         Task<BaseResponse> AddRemoveFromCart(int id);
         Task<OrderResponseModel> GetOrderById(int id);
         Task<OrdersResponseModel> GetOrderByOrderNo(string OrderNo);
