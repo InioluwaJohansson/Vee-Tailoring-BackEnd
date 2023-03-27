@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using V_Tailoring.Entities;
 using V_Tailoring.Entities.Identity;
+using Vee_Tailoring.Entities;
 
 namespace V_Tailoring.Context
 {
@@ -24,6 +25,7 @@ namespace V_Tailoring.Context
         public DbSet<Material> Materials { get; set; }
         public DbSet<DefaultPrice> DefaultPrices { get; set; }
         public DbSet<Pattern> Patterns { get; set; }
+        public DbSet<Payment> Payment { get; set; }
         public DbSet<Style> Styles { get; set; }
         public DbSet<Template> Templates { get; set; }
         public DbSet<Collection> Collections { get; set; }

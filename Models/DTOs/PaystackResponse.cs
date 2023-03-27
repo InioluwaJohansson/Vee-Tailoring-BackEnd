@@ -10,4 +10,8 @@
     {
         public PaystackData PaystackData { get; set; }
     }
+    public class PaypalResponse : BaseResponse
+    {
+
+    }
 }
