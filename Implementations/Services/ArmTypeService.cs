@@ -79,11 +79,11 @@ namespace V_Tailoring.Implementations.Services
          }
         public async Task<ArmTypesResponseModel> GetAllArmType()
         {
-            var clothCategories = await _repository.List();
-            if (clothCategories != null)
+            var armTypes = await _repository.List();
+            if (armTypes != null)
             {
                 return new ArmTypesResponseModel() {
-                    Data = clothCategories.Select(clothCategory => GetDetails(clothCategory)).ToList(),
+                    Data = armTypes.Select(armType => GetDetails(armType)).ToList(),
                     Message = "ArmTypes Found",
                     Status = true
                 };
@@ -91,8 +91,8 @@ namespace V_Tailoring.Implementations.Services
             return new ArmTypesResponseModel()
             {
                 Data = null,
-                Message = "ArmTypes Found",
-                Status = true
+                Message = "No ArmTypes Has",
+                Status = false
             };
         }
         public GetArmTypeDto GetDetails(ArmType armType)

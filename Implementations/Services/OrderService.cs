@@ -1,12 +1,10 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using V_Tailoring.Emails;
+﻿using V_Tailoring.Emails;
 using V_Tailoring.Entities;
 using V_Tailoring.Interface.Services;
 using V_Tailoring.Interfaces.Respositories;
 using V_Tailoring.Models.DTOs;
 using V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.DTOs;
 
 namespace V_Tailoring.Implementations.Services
 {
@@ -24,8 +22,7 @@ namespace V_Tailoring.Implementations.Services
         IStaffRepo _staffrepository;
         ICustomerRepo _customerrepository;
         IEmailSend _email;
-        IConfiguration _configuration;
-        public OrderService(IEmailSend email, IConfiguration configuration, IOrderRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
+        public OrderService(IEmailSend email, IOrderRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
         {
             _repository = repository;
             _stylerepository = styleRepo;
@@ -39,7 +36,6 @@ namespace V_Tailoring.Implementations.Services
             _staffrepository = staffrepository;
             _customerrepository = customerrepository;
             _email = email;
-            _configuration = configuration;
         }
         public async Task<BaseResponse> Create(CreateOrderDto createOrderDto)
         {
@@ -131,74 +127,50 @@ namespace V_Tailoring.Implementations.Services
                 Status = false
             };
         }
-        public async Task<BaseResponse> UpdatePayment(int id)
+        public async Task<BaseResponse> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment)
         {
-            var cart = await GetCartOrdersByCustomerId(id);
-            var customer = await _customerrepository.GetById(id);
-            if (cart != null & customer != null)
+            if (updateOrderPayment.Check == true)
             {
-                var generateRef = Guid.NewGuid().ToString().Substring(0, 10);
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                var url = "https://api.paystack.co/transaction/initialize";
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
-                var content = new StringContent(JsonSerializer.Serialize(new
+                var customer = await _customerrepository.GetById(updateOrderPayment.CustomerId);
+                var cart = await GetCartOrdersByCustomerId(customer.Id);
+                foreach (var order in cart.Data.GetOrderDtos)
                 {
-                    amount = cart.Data.TotalPrice,
-                    email = customer.User.Email,
-                    referenceNumber = generateRef
-
-                }), Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                var resString = await response.Content.ReadAsStringAsync();
-                var responseObj = JsonSerializer.Deserialize<PaystackResponse>(resString);
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    var updateOrder = await _repository.GetOrderById(order.Id);
+                    updateOrder.IsPaid = IsPaid.Paid;
+                    updateOrder.AddToCart = false;
+                    updateOrder.ReferenceNumber = updateOrderPayment.ReferenceNo;
+                    await _repository.Update(updateOrder);
+                }                 
+                var email = new CreateEmailDto()
                 {
-                    foreach (var order in cart.Data.GetOrderDtos)
-                    {
-                        var updateOrder = await _repository.GetOrderById(order.Id);
-                        updateOrder.IsPaid = IsPaid.Paid;
-                        updateOrder.AddToCart = false;
-                        await _repository.Update(updateOrder);
-                    }
-                    
-                    var email = new CreateEmailDto()
-                    {
-                        Subject = "Order(s) Completed Successfully",
-                        ReceiverName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
-                        ReceiverEmail = customer.User.Email,
-                        Message = $"Hi Thanks for shopping with us. /n" +
-                    $"Check your order history to keep track of your Orders /n" +
-                    $"{GetOrderNos(cart)} /n" + "Vee Tailoring"
-                    };
-                    await _email.SendEmail(email);
-                    var adminEmail = new CreateEmailDto()
-                    {
-                        Subject = "Order(s) Payment Completed Successfully",
-                        ReceiverName = $"Inioluwa Johansson",
-                        ReceiverEmail = "inioluwa.makinde10@gmail.com",
-                        Message = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName} shopped with Uu. /n" +
-                    $"You can use the following order numbers to keep track of the Orders /n" +
-                    $"{(GetOrderNos(cart))} /n" + "Vee Tailoring"
-                    };
-                    await _email.SendEmail(adminEmail);
-                    return new BaseResponse()
-                    {
-                        Message = "Payment Successful",
-                        Status = true
-                    };
-                }
+                    Subject = "Order(s) Completed Successfully",
+                    ReceiverName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
+                    ReceiverEmail = customer.User.Email,
+                    Message = $"Hi Thanks for shopping with us. /n" +
+                $"Check your order history to keep track of your Orders /n" +
+                $"{GetOrderNos(cart).ToString()} /n" + "Vee Tailoring"
+                };
+                await _email.SendEmail(email);
+                var adminEmail = new CreateEmailDto()
+                {
+                    Subject = "Order(s) Payment Completed Successfully",
+                    ReceiverName = $"Inioluwa Johansson",
+                    ReceiverEmail = "inioluwa.makinde10@gmail.com",
+                    Message = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName} shopped with Uu. /n" +
+                $"You can use the following order numbers to keep track of the Orders /n" +
+                $"{(GetOrderNos(cart))} /n" + "Vee Tailoring"
+                };
+                await _email.SendEmail(adminEmail);
                 return new BaseResponse()
                 {
-                    Message = "Payment not successful. Try again!",
-                    Status = false
+                    Message = "Payment Successful",
+                    Status = true
                 };
             }
             return new BaseResponse()
             {
-                Message = "Payment Failed",
-                Status = false
+                Message = "Payment Successful",
+                Status = true
             };
         }
         public async Task<BaseResponse> AddRemoveFromCart(int id)
@@ -932,7 +904,22 @@ namespace V_Tailoring.Implementations.Services
                     },
                     GetMeasurementDto = new GetMeasurementDto()
                     {
-                        
+                        AnkleSize = Decimal.Parse(customer.Measurements.AnkleSize),
+                        ArmLength = Decimal.Parse(customer.Measurements.ArmLength),
+                        ArmSize = Decimal.Parse(customer.Measurements.ArmSize),
+                        BackWaist = Decimal.Parse(customer.Measurements.BackWaist),
+                        BodyHeight = Decimal.Parse(customer.Measurements.BodyHeight),
+                        BurstGirth = Decimal.Parse(customer.Measurements.BurstGirth),
+                        FrontWaist = Decimal.Parse(customer.Measurements.FrontWaist),
+                        Head = Decimal.Parse(customer.Measurements.Head),
+                        HighHips = Decimal.Parse(customer.Measurements.HighHips),
+                        HipSize = Decimal.Parse(customer.Measurements.HipSize),
+                        LegLength = Decimal.Parse(customer.Measurements.LegLength),
+                        NeckSize = Decimal.Parse(customer.Measurements.NeckSize),
+                        ShoulderWidth = Decimal.Parse(customer.Measurements.ShoulderWidth),
+                        ThirdQuarterLegLength = Decimal.Parse(customer.Measurements.ThirdQuarterLegLength),
+                        WaistSize = Decimal.Parse(customer.Measurements.WaistSize),
+                        WristCircumfrence = Decimal.Parse(customer.Measurements.WristCircumfrence),
                     }
                 },
                 GetStaffDto = new GetStaffDto()
