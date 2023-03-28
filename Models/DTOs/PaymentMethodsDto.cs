@@ -6,9 +6,14 @@
         public string access_code { get; set; }
         public string reference { get; set; }
     }
-    public class PaystackResponse : BaseResponse
+    public class PayPalData
+    {
+
+    }
+    public class PaymentMethodsDto : BaseResponse
     {
         public PaystackData PaystackData { get; set; }
+        public PayPalData PayPalData { get; set; }
     }
     public class PaypalResponse : BaseResponse
     {

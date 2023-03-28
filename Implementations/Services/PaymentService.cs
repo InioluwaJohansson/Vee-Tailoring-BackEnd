@@ -36,10 +36,9 @@ namespace Vee_Tailoring.Implementations.Services
                 var client = new HttpClient();
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage catchresponse;
+                HttpResponseMessage catchresponse = new HttpResponseMessage();
                 if(paymentMethod == PaymentMethod.Paystack)
                 {
-
                     var url = "https://api.paystack.co/transaction/initialize";
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
                     var content = new StringContent(JsonSerializer.Serialize(new
@@ -51,7 +50,7 @@ namespace Vee_Tailoring.Implementations.Services
                     }), Encoding.UTF8, "application/json");
                     catchresponse = await client.PostAsync(url, content);
                     var resString = await catchresponse.Content.ReadAsStringAsync();
-                    var responseObj = JsonSerializer.Deserialize<PaystackResponse>(resString);
+                    var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(resString);
                 }
                 if(paymentMethod == PaymentMethod.PayPal)
                 {
