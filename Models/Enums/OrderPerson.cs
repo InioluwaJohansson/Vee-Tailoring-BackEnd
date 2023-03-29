@@ -1,8 +1,7 @@
-﻿namespace V_Tailoring.Models.Enums
+﻿namespace Vee_Tailoring.Models.Enums;
+
+public enum OrderPerson
 {
-    public enum OrderPerson
-    {
-        MySelf = 1,
-        Others = 2,
-    }
+    MySelf = 1,
+    Others = 2,
 }

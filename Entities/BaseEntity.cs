@@ -1,8 +1,7 @@
-﻿namespace V_Tailoring.Entities
+﻿namespace Vee_Tailoring.Entities;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public int Id { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-    }
+    public int Id { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }

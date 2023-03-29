@@ -1,9 +1,8 @@
-﻿using V_Tailoring.Entities;
-namespace V_Tailoring.Interfaces.Respositories
+﻿using Vee_Tailoring.Entities;
+namespace Vee_Tailoring.Interfaces.Respositories;
+
+public interface IArmTypeRepo: IRepo<ArmType>
 {
-    public interface IArmTypeRepo: IRepo<ArmType>
-    {
-        Task<ArmType> GetById(int Id);
-        Task<IList<ArmType>> List();
-    }
+    Task<ArmType> GetById(int Id);
+    Task<IList<ArmType>> List();
 }

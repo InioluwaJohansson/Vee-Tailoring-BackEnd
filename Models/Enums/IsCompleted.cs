@@ -1,8 +1,7 @@
-﻿namespace V_Tailoring.Models.Enums
+﻿namespace Vee_Tailoring.Models.Enums;
+
+public enum IsCompleted
 {
-    public enum IsCompleted
-    {
-        Completed = 1,
-        Pending,
-    }
+    Completed = 1,
+    Pending,
 }

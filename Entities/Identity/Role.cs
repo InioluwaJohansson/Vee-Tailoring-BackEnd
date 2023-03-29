@@ -1,11 +1,10 @@
-﻿using V_Tailoring.Contracts;
+﻿using Vee_Tailoring.Contracts;
 
-namespace V_Tailoring.Entities.Identity
+namespace Vee_Tailoring.Entities.Identity;
+
+public class Role : AuditableEntity
 {
-    public class Role : AuditableEntity
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
-    }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 }

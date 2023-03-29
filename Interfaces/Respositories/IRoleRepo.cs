@@ -1,10 +1,9 @@
-﻿using V_Tailoring.Entities.Identity;
+﻿using Vee_Tailoring.Entities.Identity;
 
-namespace V_Tailoring.Interfaces.Respositories
+namespace Vee_Tailoring.Interfaces.Respositories;
+
+public interface IRoleRepo : IRepo<Role>
 {
-    public interface IRoleRepo : IRepo<Role>
-    {
-        Task<IList<Role>> GetRoleByUserId(int id);
-        Task<IList<Role>> GetAllRoles();
-    }
+    Task<IList<Role>> GetRoleByUserId(int id);
+    Task<IList<Role>> GetAllRoles();
 }

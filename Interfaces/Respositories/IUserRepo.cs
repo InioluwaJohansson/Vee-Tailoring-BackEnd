@@ -1,8 +1,7 @@
-﻿using V_Tailoring.Entities.Identity;
+﻿using Vee_Tailoring.Entities.Identity;
 
-namespace V_Tailoring.Interfaces.Respositories
+namespace Vee_Tailoring.Interfaces.Respositories;
+
+public interface IUserRepo : IRepo<User>
 {
-    public interface IUserRepo : IRepo<User>
-    {
-    }
 }
