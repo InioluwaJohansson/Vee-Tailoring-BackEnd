@@ -1,9 +1,8 @@
-namespace V_Tailoring.Contracts
+namespace Vee_Tailoring.Contracts;
+
+public interface ISoftDelete
 {
-    public interface ISoftDelete
-    {
-         DateTime? DeletedOn{get; set;}
-         int DeletedBy{get; set;}
-         bool IsDeleted{get; set;}
-    }
+     DateTime? DeletedOn{get; set;}
+     int DeletedBy{get; set;}
+     bool IsDeleted{get; set;}
 }

@@ -1,13 +1,12 @@
-﻿using V_Tailoring.Models.DTOs;
+﻿using Vee_Tailoring.Models.DTOs;
 
-namespace V_Tailoring.Interface.Services
+namespace Vee_Tailoring.Interface.Services;
+
+public interface IRoleService
 {
-    public interface IRoleService
-    {
-        Task<BaseResponse> Create(CreateRoleDto createRoleDto);
-        Task<BaseResponse> Update(int id, UpdateRoleDto updateRoleDto);
-        Task<RoleResponseModel> GetById(int id);
-        Task<RolesResponseModel> GetByUserId(int id);
-        Task<RolesResponseModel> GetAllRoles();
-    }
+    Task<BaseResponse> Create(CreateRoleDto createRoleDto);
+    Task<BaseResponse> Update(int id, UpdateRoleDto updateRoleDto);
+    Task<RoleResponseModel> GetById(int id);
+    Task<RolesResponseModel> GetByUserId(int id);
+    Task<RolesResponseModel> GetAllRoles();
 }

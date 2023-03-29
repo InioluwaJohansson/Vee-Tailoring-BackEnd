@@ -1,10 +1,9 @@
-namespace V_Tailoring.Contracts
+namespace Vee_Tailoring.Contracts;
+
+public interface IAuditableEntity
 {
-    public interface IAuditableEntity
-    {
-        public int CreatedBy{get; set;}
-        public DateTime CreatedOn{get; set;}
-        public int LastModifiedBy{get; set;}
-        public DateTime? LastModifiedOn{get; set;}
-    }
+    public int CreatedBy{get; set;}
+    public DateTime CreatedOn{get; set;}
+    public int LastModifiedBy{get; set;}
+    public DateTime? LastModifiedOn{get; set;}
 }

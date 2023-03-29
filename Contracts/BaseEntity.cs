@@ -1,7 +1,6 @@
-namespace V_Tailoring.Contracts
+namespace Vee_Tailoring.Contracts;
+
+public abstract class BaseEntity
 {
-    public abstract class BaseEntity
-    {
-        public int Id{get; set;}
-    }
+    public int Id{get; set;}
 }

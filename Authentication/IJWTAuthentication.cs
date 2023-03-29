@@ -1,11 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text;
-using V_Tailoring.Models.DTOs;
+using Vee_Tailoring.Models.DTOs;
 
-namespace V_Tailoring.Authentication
+namespace Vee_Tailoring.Authentication;
+
+public interface IJWTAuthentication
 {
-    public interface IJWTAuthentication
-    {
-        string GenerateToken(GetUserDto getUserDto);
-    }
+    string GenerateToken(GetUserDto getUserDto);
 }

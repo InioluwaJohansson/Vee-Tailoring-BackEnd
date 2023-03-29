@@ -1,8 +1,7 @@
-﻿using V_Tailoring.Entities;
+﻿using Vee_Tailoring.Entities;
 
-namespace V_Tailoring.Interfaces.Respositories
+namespace Vee_Tailoring.Interfaces.Respositories;
+
+public interface IAddressRepo : IRepo<Address>
 {
-    public interface IAddressRepo : IRepo<Address>
-    {
-    }
 }

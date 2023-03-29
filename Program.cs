@@ -1,15 +1,15 @@
-using V_Tailoring.Authentication;
-using V_Tailoring.Interface.Services;
-using V_Tailoring.Interfaces.Respositories;
-using V_Tailoring.Implementations.Services;
-using V_Tailoring.Implementations.Respositories;
-using V_Tailoring.Emails;
+using Vee_Tailoring.Authentication;
+using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Respositories;
+using Vee_Tailoring.Implementations.Services;
+using Vee_Tailoring.Implementations.Respositories;
+using Vee_Tailoring.Emails;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using V_Tailoring.Context;
+using Vee_Tailoring.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using V_Tailoring;
+using Vee_Tailoring;
 
 var builder = WebApplication.CreateBuilder(args);
 

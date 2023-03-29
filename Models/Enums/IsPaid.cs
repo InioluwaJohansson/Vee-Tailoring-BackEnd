@@ -1,9 +1,8 @@
-﻿namespace V_Tailoring.Models.Enums
+﻿namespace Vee_Tailoring.Models.Enums;
+
+public enum IsPaid
 {
-    public enum IsPaid
-    {
-        Paid = 1,
-        Pending,
-        NotPaid,
-    }
+    Paid = 1,
+    Pending,
+    NotPaid,
 }

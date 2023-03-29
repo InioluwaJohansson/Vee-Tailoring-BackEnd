@@ -1,7 +1,6 @@
-namespace V_Tailoring.Emails
+namespace Vee_Tailoring.Emails;
+
+public interface IEmailSend
 {
-    public interface IEmailSend
-    {
-        Task<bool> SendEmail(CreateEmailDto createEmailDto);
-    }
+    Task<bool> SendEmail(CreateEmailDto createEmailDto);
 }

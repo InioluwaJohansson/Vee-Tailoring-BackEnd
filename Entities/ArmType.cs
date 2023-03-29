@@ -1,8 +1,7 @@
-﻿using V_Tailoring.Contracts;
-namespace V_Tailoring.Entities
+﻿using Vee_Tailoring.Contracts;
+namespace Vee_Tailoring.Entities;
+
+public class ArmType: AuditableEntity
 {
-    public class ArmType: AuditableEntity
-    {
-        public string ArmLength { get; set; }
-    }
+    public string ArmLength { get; set; }
 }

@@ -1,131 +1,130 @@
-﻿using V_Tailoring.Entities.Identity;
-using V_Tailoring.Interfaces.Respositories;
-using V_Tailoring.Interface.Services;
-using V_Tailoring.Models.DTOs;
+﻿using Vee_Tailoring.Entities.Identity;
+using Vee_Tailoring.Interfaces.Respositories;
+using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Models.DTOs;
 
-namespace V_Tailoring.Implementations.Services
+namespace Vee_Tailoring.Implementations.Services;
+
+public class RoleService : IRoleService
 {
-    public class RoleService : IRoleService
+    IRoleRepo _repository;
+    IUserRepo _userRepository;
+    public RoleService(IRoleRepo roleRepository, IUserRepo userRepository)
     {
-        IRoleRepo _repository;
-        IUserRepo _userRepository;
-        public RoleService(IRoleRepo roleRepository, IUserRepo userRepository)
+        _repository = roleRepository;
+        _userRepository = userRepository;
+    }
+    public async Task<BaseResponse> Create(CreateRoleDto createRoleDto)
+    {
+        var role = await _repository.Get(c => c.Name == createRoleDto.Name);
+        if (role != null)
         {
-            _repository = roleRepository;
-            _userRepository = userRepository;
-        }
-        public async Task<BaseResponse> Create(CreateRoleDto createRoleDto)
-        {
-            var role = await _repository.Get(c => c.Name == createRoleDto.Name);
-            if (role != null)
+            return new BaseResponse()
             {
-                return new BaseResponse()
-                {
-                    Message = "Role Already Exist",
-                    Status = false,
-                };
-            }
-            var newRole = new Role()
-            {
-                Name = createRoleDto.Name,
-                Description = createRoleDto.Description,
-                IsDeleted = false,
-            };
-            await _repository.Create(newRole);
-            return new BaseResponse ()
-            {
-                Message = "Role Created Successfully",
-                Status = true,
+                Message = "Role Already Exist",
+                Status = false,
             };
         }
-        public async Task<BaseResponse> Update(int id, UpdateRoleDto model)
+        var newRole = new Role()
         {
-            var user = await _userRepository.Get(u => u.Id == id);
-            if (user == null)
-            {
-                return new BaseResponse
-                {
-                    Message = "User Not Found",
-                    Status = false,
-                };
-            }
-            var updateUserRole = user.UserRoles.Where(x => x.UserId == user.Id).ToList();
-            var getRole = await _repository.Get(x => x.Name == model.Name);
-            foreach (var item in updateUserRole)
-            {
-                item.RoleId = getRole.Id;
-            }
-            user.UserRoles = updateUserRole;
-            await _userRepository.Update(user);
+            Name = createRoleDto.Name,
+            Description = createRoleDto.Description,
+            IsDeleted = false,
+        };
+        await _repository.Create(newRole);
+        return new BaseResponse ()
+        {
+            Message = "Role Created Successfully",
+            Status = true,
+        };
+    }
+    public async Task<BaseResponse> Update(int id, UpdateRoleDto model)
+    {
+        var user = await _userRepository.Get(u => u.Id == id);
+        if (user == null)
+        {
             return new BaseResponse
             {
-                Message = "User Role Updated Successfully",
+                Message = "User Not Found",
+                Status = false,
+            };
+        }
+        var updateUserRole = user.UserRoles.Where(x => x.UserId == user.Id).ToList();
+        var getRole = await _repository.Get(x => x.Name == model.Name);
+        foreach (var item in updateUserRole)
+        {
+            item.RoleId = getRole.Id;
+        }
+        user.UserRoles = updateUserRole;
+        await _userRepository.Update(user);
+        return new BaseResponse
+        {
+            Message = "User Role Updated Successfully",
+            Status = true,
+        };
+    }
+    public async Task<RoleResponseModel> GetById(int id)
+    {
+        var role = await _repository.Get(c => c.Id == id);
+        if (role != null)
+        {
+            return new RoleResponseModel
+            {
+                Data = GetDetails(role),
+                Message = "Role Retrieved Successfully",
                 Status = true,
             };
         }
-        public async Task<RoleResponseModel> GetById(int id)
+        return new RoleResponseModel
         {
-            var role = await _repository.Get(c => c.Id == id);
-            if (role != null)
-            {
-                return new RoleResponseModel
-                {
-                    Data = GetDetails(role),
-                    Message = "Role Retrieved Successfully",
-                    Status = true,
-                };
-            }
-            return new RoleResponseModel
-            {
-                Message = "Role not found",
-                Status = false,
-            };
-        }
-        public async Task<RolesResponseModel> GetByUserId(int id)
+            Message = "Role not found",
+            Status = false,
+        };
+    }
+    public async Task<RolesResponseModel> GetByUserId(int id)
+    {
+        var role = await _repository.GetRoleByUserId(id);
+        if (role != null)
         {
-            var role = await _repository.GetRoleByUserId(id);
-            if (role != null)
-            {
-                return new RolesResponseModel
-                {
-                    Data = role.Select(x => GetDetails(x)).ToList(),
-                    Message = "Role Retrieved Successfully",
-                    Status = true,
-                };
-            }
             return new RolesResponseModel
             {
-                Message = "Role not found",
-                Status = false,
+                Data = role.Select(x => GetDetails(x)).ToList(),
+                Message = "Role Retrieved Successfully",
+                Status = true,
             };
         }
-        public async Task<RolesResponseModel> GetAllRoles()
+        return new RolesResponseModel
         {
-            var role = await _repository.GetAllRoles();
-            if (role != null)
-            {
-                return new RolesResponseModel()
-                {
-                    Data = role.Select(x => GetDetails(x)).ToList(),
-                    Message = "Roles List Retrieved Successfully",
-                    Status = true
-                };
-            }
-            return new RolesResponseModel ()
-            {
-                Data = null,
-                Message = "Unable To Retrieve Roles List Successfully",
-                Status = false,
-            };
-        }
-        public GetRoleDto GetDetails(Role role)
+            Message = "Role not found",
+            Status = false,
+        };
+    }
+    public async Task<RolesResponseModel> GetAllRoles()
+    {
+        var role = await _repository.GetAllRoles();
+        if (role != null)
         {
-            return new GetRoleDto()
+            return new RolesResponseModel()
             {
-                Id = role.Id,
-                Name = role.Name,
-                Description = role.Description,
+                Data = role.Select(x => GetDetails(x)).ToList(),
+                Message = "Roles List Retrieved Successfully",
+                Status = true
             };
         }
+        return new RolesResponseModel ()
+        {
+            Data = null,
+            Message = "Unable To Retrieve Roles List Successfully",
+            Status = false,
+        };
+    }
+    public GetRoleDto GetDetails(Role role)
+    {
+        return new GetRoleDto()
+        {
+            Id = role.Id,
+            Name = role.Name,
+            Description = role.Description,
+        };
     }
 }
