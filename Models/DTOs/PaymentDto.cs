@@ -22,7 +22,7 @@ public class UpdateOrderPaymentCheck
 }
 public class InvoiceResponse : BaseResponse
 {
-    public FileOptions Data { get; set; }
+    public string FilePath { get; set; }
 }
 public class PaymentResponse : BaseResponse
 {
