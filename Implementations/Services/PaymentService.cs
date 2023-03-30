@@ -216,16 +216,30 @@ public class PaymentService : IPaymentService
                 + $"{getinvoice.Customer.UserDetails.Address.Country} /n /n"
                 + "/t /t Vee Management";
 
-            return new InvoiceResponse()
+            string fileName = $"{getinvoice.ReferenceNumber}.pdf";
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Invoices\\");
+            if (!System.IO.Directory.Exists($"{folderPath}\\{fileName}"))
             {
-                Data = ,
-                Message = "Invoice Generated Successfully",
-                Status = true
-            };
+                Directory.CreateDirectory(folderPath);
+                var filePath = Path.Combine(folderPath, fileName);
+                if(File.GetCreationTime(filePath) < File.GetCreationTime(filePath).AddMinutes(5.00)){
+                    File.Delete(filePath);
+                }
+                if (File.Exists(filePath) == true || File.Exists(filePath) == false)
+                {
+                    await File.WriteAllTextAsync(filePath, sendInvoice);
+                    return new InvoiceResponse()
+                    {
+                        FilePath = filePath,
+                        Message = "Invoice Generated Successfully",
+                        Status = true
+                    };
+                }
+            }
         }
         return new InvoiceResponse()
         {
-            Data = FileOptions.DeleteOnClose,
+            FilePath = null,
             Message = "Unable To Generate Invoice",
             Status = false
         };
