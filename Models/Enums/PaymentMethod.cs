@@ -4,7 +4,7 @@
     {
         public enum PaymentMethod
         {
-            PayPal = 1,
+            MasterCard = 1,
             Paystack = 2,
         }
     }

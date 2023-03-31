@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Vee_Tailoring.Context;
 
@@ -10,9 +11,10 @@ using Vee_Tailoring.Context;
 namespace Vee_Tailoring.Migrations
 {
     [DbContext(typeof(TailoringContext))]
-    partial class TailoringContextModelSnapshot : ModelSnapshot
+    [Migration("20230331225924_Vee")]
+    partial class Vee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
