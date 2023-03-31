@@ -6,7 +6,7 @@ namespace Vee_Tailoring.Interfaces.Services;
 
 public interface IPaymentService
 {
-    Task<BaseResponse> MakePayment(int id, PaymentMethod paymentMethod);
+    Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment);
     Task<BaseResponse> VerifyPayment(string referenceNumber);
     Task<BaseResponse> VerifyPaymentByCustomer(int id, string referenceNumber);
     Task<PaymentResponse> GetPayment(int id);

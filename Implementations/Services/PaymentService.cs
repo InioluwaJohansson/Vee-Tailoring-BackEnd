@@ -23,23 +23,24 @@ public class PaymentService : IPaymentService
         _customerRepo = customerRepo;
         _configuration = configuration;
     }
-    public async Task<BaseResponse> MakePayment(int id, PaymentMethod paymentMethod)
+    public async Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment)
     {
         var customer = await _customerRepo.GetByUserId(id);
         var cart = await _orderService.GetCartOrdersByCustomerId(id);
         if (cart != null & customer != null)
         {
-            var generateRef = Guid.NewGuid().ToString().Substring(0, 10);
+            var generateRef = Guid.NewGuid().ToString().Substring(0, 15);
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             HttpResponseMessage catchresponse = new HttpResponseMessage();
-            if(paymentMethod == PaymentMethod.Paystack)
+            if(makePayment.paymentMethod == PaymentMethod.Paystack)
             {
                 var url = "https://api.paystack.co/transaction/initialize";
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
                 var content = new StringContent(JsonSerializer.Serialize(new
                 {
+                    currency = "USD",
                     amount = cart.Data.TotalPrice,
                     email = customer.User.Email,
                     referenceNumber = generateRef
@@ -49,16 +50,20 @@ public class PaymentService : IPaymentService
                 var reString = await catchresponse.Content.ReadAsStringAsync();
                 var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
             }
-            if(paymentMethod == PaymentMethod.PayPal)
+            if(makePayment.paymentMethod == PaymentMethod.MasterCard)
             {
                 var url = "https://api.paystack.co/transaction/initialize";
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
                 var content = new StringContent(JsonSerializer.Serialize(new
                 {
+                    currency = "USD",
+                    pin = makePayment.CardPin,
+                    validFrom = makePayment.ValidFrom,
+                    untilEnd = makePayment.UntilEnd,
+                    cvv = makePayment.CVV,
                     amount = cart.Data.TotalPrice,
                     email = customer.User.Email,
                     referenceNumber = generateRef
-
                 }), Encoding.UTF8, "application/json");
                 catchresponse = await client.PostAsync(url, content);
                 var reString = await catchresponse.Content.ReadAsStringAsync();
@@ -90,6 +95,11 @@ public class PaymentService : IPaymentService
                     };
                 }
             }
+            return new BaseResponse()
+            {
+                Message = "Unable To Make Orders Payment Due To Payment Gateway Error!",
+                Status = false
+            };
         }
         return new BaseResponse()
         {
@@ -216,30 +226,52 @@ public class PaymentService : IPaymentService
                 + $"{getinvoice.Customer.UserDetails.Address.Country} /n /n"
                 + "/t /t Vee Management";
 
-            string fileName = $"{getinvoice.ReferenceNumber}.pdf";
+            string path = "", fileName = $"{getinvoice.ReferenceNumber}.pdf";
             var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Invoices\\");
             if (!System.IO.Directory.Exists($"{folderPath}\\{fileName}"))
             {
                 Directory.CreateDirectory(folderPath);
-                var filePath = Path.Combine(folderPath, fileName);
-                if(File.GetCreationTime(filePath) < File.GetCreationTime(filePath).AddMinutes(5.00)){
-                    File.Delete(filePath);
-                }
-                if (File.Exists(filePath) == true || File.Exists(filePath) == false)
-                {
-                    await File.WriteAllTextAsync(filePath, sendInvoice);
-                    return new InvoiceResponse()
-                    {
-                        FilePath = filePath,
-                        Message = "Invoice Generated Successfully",
-                        Status = true
-                    };
-                }
+                path = Path.Combine(folderPath, fileName);
+                if(File.GetCreationTime(path) < File.GetCreationTime(path).AddMinutes(1.3)) File.Delete(path);
+                
+                if (File.Exists(path) == true || File.Exists(path) == false) await File.WriteAllTextAsync(path, sendInvoice);
             }
+            var InvoiceOutput = new GetInvoiceDto()
+            {
+                ReferenceNo = getinvoice.ReferenceNumber,
+                AmountPaid = getinvoice.AmountPaid,
+                DateOfPayment = getinvoice.DateOfPayment,
+                Email = getinvoice.Customer.User.Email,
+                FirstName = $"{getinvoice.Customer.UserDetails.FirstName} {getinvoice.Customer.UserDetails.LastName}",
+                FilePath = path,
+                GetAddressDto = new GetAddressDto()
+                {
+                    NumberLine = getinvoice.Customer.UserDetails.Address.NumberLine,
+                    Street = getinvoice.Customer.UserDetails.Address.Street,
+                    City = getinvoice.Customer.UserDetails.Address.City,
+                    Region = getinvoice.Customer.UserDetails.Address.Region,
+                    State = getinvoice.Customer.UserDetails.Address.State,
+                    Country = getinvoice.Customer.UserDetails.Address.Country,
+                    PostalCode = getinvoice.Customer.UserDetails.Address.PostalCode
+                },
+                GetOrderDto = invoice.Select(x => new GetOrderDto()
+                {
+                    Id = x.Id,
+                    OrderId = x.Order.OrderId,
+                    Pieces = x.Order.Pieces,
+                    Price = x.Order.Price
+                }).ToList(),
+            };
+            return new InvoiceResponse()
+            {
+                Data = InvoiceOutput,
+                Message = "Invoice Generated Successfully",
+                Status = true
+            };
         }
         return new InvoiceResponse()
         {
-            FilePath = null,
+            Data = null,
             Message = "Unable To Generate Invoice",
             Status = false
         };

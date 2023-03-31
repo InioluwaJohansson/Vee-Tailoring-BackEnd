@@ -17,7 +17,7 @@ public class PaymentController : ControllerBase
     }
     // POST : Addpayment
     [HttpPost("MakePayment")]
-    public async Task<IActionResult> MakePayment(int id, PaymentMethod method)
+    public async Task<IActionResult> MakePayment(int id, MakePaymentDto method)
     {
         var payment = await _paymentService.MakePayment(id, method);
         if (payment.Status == true)
