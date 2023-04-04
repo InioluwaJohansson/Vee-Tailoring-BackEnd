@@ -354,7 +354,7 @@ public class CustomerService : ICustomerService
     }
     public async Task<BaseResponse> DeActivateCustomer(int id)
     {
-        var customer = await _repository.GetById(id);
+        var customer = await _repository.GetByUserId(id);
         if (customer != null)
         {
             customer.IsDeleted = true;
