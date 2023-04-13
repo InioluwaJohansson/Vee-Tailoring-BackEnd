@@ -3,6 +3,8 @@ using Vee_Tailoring.Interface.Services;
 using Vee_Tailoring.Models.DTOs;
 using System;
 using Vee_Tailoring.Emails;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -43,7 +45,7 @@ public class UserService : IUserService
         return new UserLoginResponse()
         {
             Data = null,
-            Message = "Invalid Email Or Password",
+            Message = "Invalid Email Or Password!",
             Status = false
         };
     }
@@ -52,19 +54,23 @@ public class UserService : IUserService
         var user = await _repository.Get(c => c.Email == email);
         if (user != null)
         {
-            string passwordLink = $"http://127.0.0.1:5500/Recovery/PasswordRecovery.html?id={user.Id}";
+            DateTime resetDate = DateTime.Now.AddMinutes(5);
+            string token = Guid.NewGuid().ToString().Substring(0, 32);
+            string token2 = Guid.NewGuid().ToString().Substring(0, 32);
+            string passwordLink = $"http://127.0.0.1:5500/Recovery/PasswordAuth.html?{token}{token2}?{resetDate}?{user.Id}?{token}{token2}";
             var sendEmail = new CreateEmailDto()
             {
                 Subject = "V Tailoring Account Password Recovery",
                 ReceiverName = $"{user.UserName}",
                 ReceiverEmail = user.Email,
                 Message = $"Click the link below to reset your Password. /n" +
-                $"<a href={passwordLink} >Click Here<a>",
+                $"<a href={passwordLink} >Click Here<a>" + 
+                "/n This link expires in 3 minutes. /n/n Vee Tailoring Management",
             };
             var response = await _emailSend.SendEmail(sendEmail);
             return new BaseResponse()
             {
-                Message = $"A Password Reset Link Has Been Sent To {email}",
+                Message = $"A Password Reset Link Has Been Sent To {email}, {passwordLink}",
                 Status = true
             };
         }
@@ -96,7 +102,7 @@ public class UserService : IUserService
     public async Task<BaseResponse> GenerateReCAPCHA()
     {
         string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
-        string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 3).ToLower();
+        string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
         return new BaseResponse
         {
             Message = Upper + Lower,
