@@ -1,10 +1,9 @@
 ﻿using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Interface.Services;
 using Vee_Tailoring.Models.DTOs;
-using System;
 using Vee_Tailoring.Emails;
-using System.IO;
-using System.Drawing.Imaging;
+using sib_api_v3_sdk.Model;
+using System.Reflection.Metadata;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -99,14 +98,46 @@ public class UserService : IUserService
             Status = false
         };
     }
-    public async Task<BaseResponse> GenerateReCAPCHA()
+    public async Task<ReCAPCHAResponse> GenerateReCAPCHA()
     {
         string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
         string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
-        return new BaseResponse
+        string reCAPCHA = Upper + Lower;
+        return new ReCAPCHAResponse
         {
-            Message = Upper + Lower,
+            Message = "ReCAPCHA Successfully Generated!",
+            reCAPCHA = reCAPCHA,
+            ImagePath = await ReCAPCHAImage(reCAPCHA),
             Status = true,
         };
+    }
+    protected async Task<string> ReCAPCHAImage(string reCAPCHA)
+    {
+        if (reCAPCHA != null)
+        {
+            string pathTxt = "", fileTxt = $"{reCAPCHA}.txt";
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\ReCAPCHA\\");
+            if (!Directory.Exists($"{folderPath}"))
+            {
+                Directory.CreateDirectory(folderPath);
+                pathTxt = Path.Combine(folderPath, fileTxt);
+            }
+            if (File.GetCreationTime(pathTxt) < File.GetCreationTime(pathTxt).AddMinutes(1.3)) File.Delete(pathTxt);
+
+            if (File.Exists(pathTxt) == true || File.Exists(pathTxt) == false) await File.WriteAllTextAsync(pathTxt, reCAPCHA);
+            string path = $"{folderPath}\\{reCAPCHA}.jpg";
+            var doc = new Document();
+            var extractedPage = doc.ExtractPages(0, 1);
+            var fileSave = extractedPage.Save($"{reCAPCHA}.jpg");
+
+            if (!File.Exists(path) || File.Exists(path))
+            {
+                if (File.GetCreationTime(path) < File.GetCreationTime(path).AddMinutes(1.3)) File.Delete(path);
+
+                File.Copy(fileSave, path);
+            }
+            return $"{path}";
+        }
+        return null;
     }
 }
