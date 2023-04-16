@@ -26,3 +26,8 @@ public class UserLoginResponse : BaseResponse
     public GetUserDto Data { get; set; }
     public string Token { get; set; }
 }
+public class ReCAPCHAResponse : BaseResponse
+{
+    public string ImagePath { get; set; }
+    public string reCAPCHA { get; set; }
+}

@@ -232,8 +232,11 @@ public class PaymentService : IPaymentService
             {
                 Directory.CreateDirectory(folderPath);
                 path = Path.Combine(folderPath, fileName);
-                if(File.GetCreationTime(path) < File.GetCreationTime(path).AddMinutes(1.3)) File.Delete(path);
-                
+            }
+            if(getinvoice.ReferenceNumber != null)
+            {
+                if (File.GetCreationTime(path) < File.GetCreationTime(path).AddMinutes(1.3)) File.Delete(path);
+
                 if (File.Exists(path) == true || File.Exists(path) == false) await File.WriteAllTextAsync(path, sendInvoice);
             }
             var InvoiceOutput = new GetInvoiceDto()
