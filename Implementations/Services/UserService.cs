@@ -1,9 +1,19 @@
 ﻿using Vee_Tailoring.Interfaces.Respositories;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Emails;
 using sib_api_v3_sdk.Model;
 using System.Reflection.Metadata;
+using Aspose.Words;
+using static System.Net.Mime.MediaTypeNames;
+using System.Drawing.Text;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Drawing.Imaging;
+using Microsoft.AspNetCore.Hosting.Server;
+using System.Xml.Linq;
+using System.Xml;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -103,7 +113,7 @@ public class UserService : IUserService
         string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
         string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
         string reCAPCHA = Upper + Lower;
-        return new ReCAPCHAResponse
+        return new ReCAPCHAResponse()
         {
             Message = "ReCAPCHA Successfully Generated!",
             reCAPCHA = reCAPCHA,
@@ -126,15 +136,16 @@ public class UserService : IUserService
 
             if (File.Exists(pathTxt) == true || File.Exists(pathTxt) == false) await File.WriteAllTextAsync(pathTxt, reCAPCHA);
             string path = $"{folderPath}\\{reCAPCHA}.jpg";
-            var doc = new Document();
+            var doc = new Aspose.Words.Document();
             var extractedPage = doc.ExtractPages(0, 1);
-            var fileSave = extractedPage.Save($"{reCAPCHA}.jpg");
+            
 
             if (!File.Exists(path) || File.Exists(path))
             {
                 if (File.GetCreationTime(path) < File.GetCreationTime(path).AddMinutes(1.3)) File.Delete(path);
 
-                File.Copy(fileSave, path);
+                //File.Move(, path);
+                extractedPage.Save(path);
             }
             return $"{path}";
         }

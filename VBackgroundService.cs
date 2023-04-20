@@ -1,7 +1,7 @@
 ﻿using Vee_Tailoring.Context;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Emails;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 
 namespace Vee_Tailoring;
 
