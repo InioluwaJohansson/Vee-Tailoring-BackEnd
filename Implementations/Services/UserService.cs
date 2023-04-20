@@ -5,15 +5,6 @@ using Vee_Tailoring.Emails;
 using sib_api_v3_sdk.Model;
 using System.Reflection.Metadata;
 using Aspose.Words;
-using static System.Net.Mime.MediaTypeNames;
-using System.Drawing.Text;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
-using System.Drawing.Imaging;
-using Microsoft.AspNetCore.Hosting.Server;
-using System.Xml.Linq;
-using System.Xml;
 
 namespace Vee_Tailoring.Implementations.Services;
 
