@@ -1,6 +1,6 @@
 ﻿using Vee_Tailoring.Entities;
 using Vee_Tailoring.Interfaces.Respositories;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 
 namespace Vee_Tailoring.Implementations.Services;

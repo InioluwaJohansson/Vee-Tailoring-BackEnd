@@ -2,7 +2,7 @@
 using Vee_Tailoring.Entities.Identity;
 using Vee_Tailoring.Entities;
 using Vee_Tailoring.Implementations.Respositories;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;

@@ -1,6 +1,6 @@
 ﻿using Vee_Tailoring.Models.DTOs;
 
-namespace Vee_Tailoring.Interface.Services;
+namespace Vee_Tailoring.Interfaces.Services;
 
 public interface IClothGenderService
 {
