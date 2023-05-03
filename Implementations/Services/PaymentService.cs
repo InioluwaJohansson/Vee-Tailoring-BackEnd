@@ -5,8 +5,9 @@ using Vee_Tailoring.Entities;
 using Vee_Tailoring.Interface.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
-using Vee_Tailoring.Interfaces.Services;
-using Vee_Tailoring.Models.Enums.V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.Enums;
+using sib_api_v3_sdk.Client;
+using Vee_Tailoring.Entities.Identity;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -23,87 +24,121 @@ public class PaymentService : IPaymentService
         _customerRepo = customerRepo;
         _configuration = configuration;
     }
-    public async Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment)
+    public async Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment, string userPassword)
     {
         var customer = await _customerRepo.GetByUserId(id);
-        var cart = await _orderService.GetCartOrdersByCustomerId(id);
-        if (cart != null & customer != null)
+        if (BCrypt.Net.BCrypt.Verify(userPassword, customer.User.Password))
         {
-            var generateRef = Guid.NewGuid().ToString().Substring(0, 15);
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            HttpResponseMessage catchresponse = new HttpResponseMessage();
-            if(makePayment.paymentMethod == PaymentMethod.Paystack)
+            var cart = await _orderService.GetCartOrdersByCustomerId(id);
+            if (cart != null && customer != null)
             {
-                var url = "https://api.paystack.co/transaction/initialize";
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
-                var content = new StringContent(JsonSerializer.Serialize(new
+                var generateRef = Guid.NewGuid().ToString().Substring(0, 15);
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage catchresponse = new HttpResponseMessage();
+                if(makePayment.paymentMethod == PaymentMethod.Paystack)
                 {
-                    currency = "USD",
-                    amount = cart.Data.TotalPrice,
-                    email = customer.User.Email,
-                    referenceNumber = generateRef
-
-                }), Encoding.UTF8, "application/json");
-                catchresponse = await client.PostAsync(url, content);
-                var reString = await catchresponse.Content.ReadAsStringAsync();
-                var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
-            }
-            if(makePayment.paymentMethod == PaymentMethod.MasterCard)
-            {
-                var url = "https://api.paystack.co/transaction/initialize";
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
-                var content = new StringContent(JsonSerializer.Serialize(new
-                {
-                    currency = "USD",
-                    pin = makePayment.CardPin,
-                    validFrom = makePayment.ValidFrom,
-                    untilEnd = makePayment.UntilEnd,
-                    cvv = makePayment.CVV,
-                    amount = cart.Data.TotalPrice,
-                    email = customer.User.Email,
-                    referenceNumber = generateRef
-                }), Encoding.UTF8, "application/json");
-                catchresponse = await client.PostAsync(url, content);
-                var reString = await catchresponse.Content.ReadAsStringAsync();
-                var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
-            }
-            if(catchresponse.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var updateOrderPayment = new UpdateOrderPaymentCheck()
-                {
-                    CustomerId = customer.Id,
-                    Check = true,
-                    ReferenceNo = generateRef
-                };
-                var pay = new Payment()
-                {
-                    AmountPaid  = cart.Data.TotalPrice,
-                    CustomerId = customer.Id,
-                    ReferenceNumber = generateRef,
-                    DateOfPayment = DateTime.UtcNow,
-                };
-                await _repository.Create(pay);
-                var updateOrder = await _orderService.UpdatePayment(updateOrderPayment);
-                if(updateOrder.Status == true)
-                {
-                    return new BaseResponse()
+                    var url = "https://api.paystack.co/transaction/initialize";
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
+                    var content = new StringContent(JsonSerializer.Serialize(new
                     {
-                        Message = "Orders Payment Successfull!",
-                        Status = updateOrder.Status
-                    };
+                        currency = "USD",
+                        amount = cart.Data.TotalPrice,
+                        email = customer.User.Email,
+                        referenceNumber = generateRef
+
+                    }), Encoding.UTF8, "application/json");
+                    catchresponse = await client.PostAsync(url, content);
+                    var reString = await catchresponse.Content.ReadAsStringAsync();
+                    var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
                 }
+                if(makePayment.paymentMethod == PaymentMethod.MasterCard)
+                {
+                    var url = "https://api.paystack.co/transaction/initialize";
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
+                    // Set up your API credentials
+
+                    // Configure the API credentials
+                    Configuration.SetApiKey(_configuration["MasterCard:ApiKey"]);
+                    Configuration.SetApiSecret(_configuration["MasterCard:ApiSecret"]);
+                    Configuration.SetSandbox(_configuration["MasterCard:NotLive"]); // Use true for sandbox/testing, false for production
+
+                    // Create a new checkout session
+                    var checkoutSession = CheckoutApi.CreateSession(merchantId, new SessionRequest
+                    {
+                        ApiOperation = "CREATE_CHECKOUT_SESSION",
+                        Order = new Order
+                        {
+                            Amount = 1000,
+                            Currency = "USD",
+                            Reference = "YourOrderReference"
+                        },
+                        Interaction = new Interaction
+                        {
+                            ReturnUrl = "https://your-website.com/checkout/complete"
+                        }
+                    });
+
+                    // Access the session ID
+                    var sessionId = checkoutSession.Session.Id;
+
+                    var content = new StringContent(JsonSerializer.Serialize(new
+                    {
+                        currency = "USD",
+                        pin = makePayment.CardPin,
+                        validFrom = makePayment.ValidFrom,
+                        untilEnd = makePayment.UntilEnd,
+                        cvv = makePayment.CVV,
+                        amount = cart.Data.TotalPrice,
+                        email = customer.User.Email,
+                        referenceNumber = generateRef
+                    }), Encoding.UTF8, "application/json");
+                    catchresponse = await client.PostAsync(url, content);
+                    var reString = await catchresponse.Content.ReadAsStringAsync();
+                    var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
+                }
+                if(catchresponse.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var updateOrderPayment = new UpdateOrderPaymentCheck()
+                    {
+                        CustomerId = customer.Id,
+                        Check = true,
+                        ReferenceNo = generateRef
+                    };
+                    var pay = new Payment()
+                    {
+                        AmountPaid  = cart.Data.TotalPrice,
+                        CustomerId = customer.Id,
+                        ReferenceNumber = generateRef,
+                        DateOfPayment = DateTime.UtcNow,
+                    };
+                    await _repository.Create(pay);
+                    var updateOrder = await _orderService.UpdatePayment(updateOrderPayment);
+                    if(updateOrder.Status == true)
+                    {
+                        return new BaseResponse()
+                        {
+                            Message = "Orders Payment Successfull!",
+                            Status = updateOrder.Status
+                        };
+                    }
+                }
+                return new BaseResponse()
+                {
+                    Message = "Unable To Make Orders Payment Due To Payment Gateway Error!",
+                    Status = false
+                };
             }
             return new BaseResponse()
             {
-                Message = "Unable To Make Orders Payment Due To Payment Gateway Error!",
-                Status = false
+                Message = "Incorrect Password!",
+                Status = true
             };
         }
         return new BaseResponse()
         {
-            Message = "Unable To Make Orders Payment!",
+            Message = "Incorrect Password!",
             Status = false
         };
     }
@@ -228,7 +263,7 @@ public class PaymentService : IPaymentService
 
             string path = "", fileName = $"{getinvoice.ReferenceNumber}.pdf";
             var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Invoices\\");
-            if (!System.IO.Directory.Exists($"{folderPath}\\{fileName}"))
+            if (!System.IO.Directory.Exists($"{folderPath}{fileName}"))
             {
                 Directory.CreateDirectory(folderPath);
                 path = Path.Combine(folderPath, fileName);

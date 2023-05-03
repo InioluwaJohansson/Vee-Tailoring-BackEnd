@@ -3,9 +3,7 @@ using Vee_Tailoring.Interface.Services;
 using Vee_Tailoring.Models.DTOs;
 using System;
 using Vee_Tailoring.Emails;
-using System.IO;
-using System.Drawing.Imaging;
-
+using sib_api_v3_sdk.Model;
 namespace Vee_Tailoring.Implementations.Services;
 
 public class UserService : IUserService
@@ -105,7 +103,8 @@ public class UserService : IUserService
         string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
         return new BaseResponse
         {
-            Message = Upper + Lower,
+            Message = "ReCAPCHA Successfully Generated!",
+            reCAPCHA = reCAPCHA,
             Status = true,
         };
     }

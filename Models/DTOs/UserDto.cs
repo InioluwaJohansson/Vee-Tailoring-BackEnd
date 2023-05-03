@@ -28,6 +28,5 @@ public class UserLoginResponse : BaseResponse
 }
 public class ReCAPCHAResponse : BaseResponse
 {
-    public string ImagePath { get; set; }
     public string reCAPCHA { get; set; }
 }
