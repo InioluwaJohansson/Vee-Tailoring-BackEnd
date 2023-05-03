@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 
 namespace Vee_Tailoring.Controllers;

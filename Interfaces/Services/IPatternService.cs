@@ -1,7 +1,7 @@
 ﻿using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
 
-namespace Vee_Tailoring.Interface.Services;
+namespace Vee_Tailoring.Interfaces.Services;
 
 public interface IPatternService
 {

@@ -1,5 +1,5 @@
 using Vee_Tailoring.Authentication;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Implementations.Services;
 using Vee_Tailoring.Implementations.Respositories;

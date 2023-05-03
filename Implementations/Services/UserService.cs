@@ -1,5 +1,5 @@
 ﻿using Vee_Tailoring.Interfaces.Respositories;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 using System;
 using Vee_Tailoring.Emails;
@@ -97,14 +97,14 @@ public class UserService : IUserService
             Status = false
         };
     }
-    public async Task<BaseResponse> GenerateReCAPCHA()
+    public async Task<ReCAPCHAResponse> GenerateReCAPCHA()
     {
         string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
         string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
-        return new BaseResponse
+        return new ReCAPCHAResponse
         {
             Message = "ReCAPCHA Successfully Generated!",
-            reCAPCHA = reCAPCHA,
+            reCAPCHA = Upper + Lower,
             Status = true,
         };
     }

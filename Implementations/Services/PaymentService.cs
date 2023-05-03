@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using Vee_Tailoring.Entities;
-using Vee_Tailoring.Interface.Services;
+using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
@@ -60,6 +60,7 @@ public class PaymentService : IPaymentService
                     // Set up your API credentials
 
                     // Configure the API credentials
+                    /*
                     Configuration.SetApiKey(_configuration["MasterCard:ApiKey"]);
                     Configuration.SetApiSecret(_configuration["MasterCard:ApiSecret"]);
                     Configuration.SetSandbox(_configuration["MasterCard:NotLive"]); // Use true for sandbox/testing, false for production
@@ -82,7 +83,7 @@ public class PaymentService : IPaymentService
 
                     // Access the session ID
                     var sessionId = checkoutSession.Session.Id;
-
+                    */
                     var content = new StringContent(JsonSerializer.Serialize(new
                     {
                         currency = "USD",
