@@ -3,9 +3,6 @@ using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Emails;
 using sib_api_v3_sdk.Model;
-using System.Reflection.Metadata;
-using Aspose.Words;
-
 namespace Vee_Tailoring.Implementations.Services;
 
 public class UserService : IUserService
@@ -103,12 +100,10 @@ public class UserService : IUserService
     {
         string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
         string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
-        string reCAPCHA = Upper + Lower;
-        return new ReCAPCHAResponse()
+        return new ReCAPCHAResponse
         {
             Message = "ReCAPCHA Successfully Generated!",
-            reCAPCHA = reCAPCHA,
-            ImagePath = await ReCAPCHAImage(reCAPCHA),
+            reCAPCHA = Upper + Lower,
             Status = true,
         };
     }

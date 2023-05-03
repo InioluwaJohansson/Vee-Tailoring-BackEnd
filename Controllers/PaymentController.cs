@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
-using Vee_Tailoring.Models.Enums.V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.Enums;
 
 namespace Vee_Tailoring.Controllers;
 
@@ -17,9 +17,9 @@ public class PaymentController : ControllerBase
     }
     // POST : Addpayment
     [HttpPost("MakePayment")]
-    public async Task<IActionResult> MakePayment(int id, [FromForm]MakePaymentDto method)
+    public async Task<IActionResult> MakePayment(int id, [FromForm]MakePaymentDto method, string password)
     {
-        var payment = await _paymentService.MakePayment(id, method);
+        var payment = await _paymentService.MakePayment(id, method, password);
         if (payment.Status == true)
         {
             return Ok(payment);

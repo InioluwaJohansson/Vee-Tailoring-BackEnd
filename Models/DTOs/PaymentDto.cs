@@ -1,5 +1,5 @@
 ﻿using Vee_Tailoring.Models.DTOs;
-using Vee_Tailoring.Models.Enums.V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.Enums;
 
 namespace Vee_Tailoring.Models.DTOs;
 

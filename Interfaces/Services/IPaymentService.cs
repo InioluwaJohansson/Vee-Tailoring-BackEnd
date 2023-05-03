@@ -1,12 +1,11 @@
 ﻿using Vee_Tailoring.Models.DTOs;
-using Vee_Tailoring.Models.DTOs;
-using Vee_Tailoring.Models.Enums.V_Tailoring.Models.Enums;
+using Vee_Tailoring.Models.Enums;
 
 namespace Vee_Tailoring.Interfaces.Services;
 
 public interface IPaymentService
 {
-    Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment);
+    Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment, string password);
     Task<BaseResponse> VerifyPayment(string referenceNumber);
     Task<BaseResponse> VerifyPaymentByCustomer(int id, string referenceNumber);
     Task<PaymentResponse> GetPayment(int id);
