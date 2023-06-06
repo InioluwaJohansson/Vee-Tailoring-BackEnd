@@ -16,11 +16,11 @@ public class EmailSender : IEmailSend
     {
         _configuration = configuration;
     }
-    public async Task<bool> SendEmail(CreateEmailDto email)
+    public async Task<bool> SendMail(CreateEmailDto email)
     {
         Configuration.Default.ApiKey.Add("api-key", _configuration["EmailSettings:SendInBlueKey"]);
         var apiInstance = new TransactionalEmailsApi();
-        string SenderName = "V Tailoring";
+        string SenderName = "Vee Tailoring";
         string SenderEmail = "inioluwa.makinde10@gmail.com";
         SendSmtpEmailSender Email = new SendSmtpEmailSender(SenderName, SenderEmail);
         string ToEmail = email.ReceiverEmail;
@@ -73,5 +73,16 @@ public class EmailSender : IEmailSend
         apiInstance.SendTransacEmail(sendSmtpEmail);
         Configuration.Default.ApiKey.Clear();
         return true;
+    }
+    public async Task<bool> SendEmail(CreateEmailDto email)
+    {
+        if(email != null)
+        {
+            return await SendMail(email);
+        }
+        else
+        {
+            return false;
+        }
     }
 } 

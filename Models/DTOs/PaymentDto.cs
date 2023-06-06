@@ -10,15 +10,17 @@ public class MakePaymentDto
     public string ValidFrom { get; set; } 
     public string UntilEnd { get; set; }
     public string CVV { get; set; }
+    public string Token { get; set; }
 }
 public class GetPaymentDto
 {
     public int Id { get; set; }
     public string ReferenceNo { get; set; }
     public decimal AmountPaid { get; set; }
+    public decimal ShippingFee { get; set; }
     public DateTime DateOfPayment { get; set; }
     public GetCustomerDto customerDto { get; set; }
-    public GetOrderDto orderDto { get; set; }
+    public ICollection<GetOrderDto> GetOrderDto { get; set; } = new HashSet<GetOrderDto>();
 }
 public class UpdateOrderPaymentCheck
 {
@@ -30,6 +32,7 @@ public class GetInvoiceDto
 {
     public string ReferenceNo { get; set; }
     public decimal AmountPaid { get; set; }
+    public decimal ShippingFee { get; set; }
     public DateTime DateOfPayment { get; set; }
     public string Email { get; set; }
     public string FirstName { get; set; }

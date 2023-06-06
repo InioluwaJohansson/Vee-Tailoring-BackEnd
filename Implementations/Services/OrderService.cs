@@ -4,7 +4,6 @@ using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
-using Vee_Tailoring.Models.DTOs;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -21,8 +20,7 @@ public class OrderService : IOrderService
     IDefaultPriceRepo _defaultPricerepository;
     IStaffRepo _staffrepository;
     ICustomerRepo _customerrepository;
-    IEmailSend _email;
-    public OrderService(IEmailSend email, IOrderRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
+    public OrderService(IOrderRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
     {
         _repository = repository;
         _stylerepository = styleRepo;
@@ -35,7 +33,6 @@ public class OrderService : IOrderService
         _defaultPricerepository = defaultPricerepository;
         _staffrepository = staffrepository;
         _customerrepository = customerrepository;
-        _email = email;
     }
     public async Task<BaseResponse> Create(CreateOrderDto createOrderDto)
     {
@@ -127,7 +124,7 @@ public class OrderService : IOrderService
             Status = false
         };
     }
-    public async Task<BaseResponse> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment)
+    public async Task<bool> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment)
     {
         if (updateOrderPayment.Check == true)
         {
@@ -140,38 +137,10 @@ public class OrderService : IOrderService
                 updateOrder.AddToCart = false;
                 updateOrder.ReferenceNumber = updateOrderPayment.ReferenceNo;
                 await _repository.Update(updateOrder);
-            }                 
-            var email = new CreateEmailDto()
-            {
-                Subject = "Order(s) Completed Successfully",
-                ReceiverName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
-                ReceiverEmail = customer.User.Email,
-                Message = $"Hi Thanks for shopping with us. /n" +
-            $"Check your order history to keep track of your Orders /n" +
-            $"{GetOrderNos(cart).ToString()} /n" + "Vee Tailoring"
-            };
-            await _email.SendEmail(email);
-            var adminEmail = new CreateEmailDto()
-            {
-                Subject = "Order(s) Payment Completed Successfully",
-                ReceiverName = $"Inioluwa Johansson",
-                ReceiverEmail = "inioluwa.makinde10@gmail.com",
-                Message = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName} shopped with Uu. /n" +
-            $"You can use the following order numbers to keep track of the Orders /n" +
-            $"{(GetOrderNos(cart))} /n" + "Vee Tailoring"
-            };
-            await _email.SendEmail(adminEmail);
-            return new BaseResponse()
-            {
-                Message = "Payment Successful",
-                Status = true
-            };
+            }
+            return true;
         }
-        return new BaseResponse()
-        {
-            Message = "Payment Successful",
-            Status = true
-        };
+        return false;
     }
     public async Task<BaseResponse> AddRemoveFromCart(int id)
     {
@@ -779,9 +748,13 @@ public class OrderService : IOrderService
                 ) * defaultPrice.Price;
             price = (measurementPrice + style.StylePrice + pattern.PatternPrice + material.MaterialPrice) * order.Pieces;
         }
-        if (order.CompletionTime.CompareTo(DateTime.Today) <= 0)
+        if (order.CompletionTime.CompareTo(DateTime.Today) <= 0 && order.IsPaid == IsPaid.Paid)
         {
             completionDate = "Order Completed";
+        }
+        else if (order.IsPaid == IsPaid.NotPaid)
+        {
+            completionDate = "NaN";
         }
         else
         {
@@ -949,11 +922,12 @@ public class OrderService : IOrderService
     }
     public string GetOrderNos(CartResponseModel cart)
     {
+        string orderString = "";
         foreach (var order in cart.Data.GetOrderDtos)
         {
-            return $"{order.OrderId.Take(5)} /n";
+            orderString += $"{order.OrderId.Take(5)} /n";
         }
-        return null;
+        return orderString;
     }
     public async Task<OrderDashboard> OrdersDashboard()
     {

@@ -11,5 +11,6 @@ public class Payment : AuditableEntity
     public Customer Customer { get; set; }
     public Order Order { get; set; }
     public decimal AmountPaid { get; set; }
+    public decimal ShippingFee { get; set; }
     public DateTime DateOfPayment { get; set; }
 }
