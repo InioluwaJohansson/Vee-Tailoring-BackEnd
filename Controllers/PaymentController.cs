@@ -15,9 +15,20 @@ public class PaymentController : ControllerBase
     {
         _paymentService = paymentService;
     }
+    // POST : GenerateToken
+    [HttpPost("GenerateToken")]
+    public async Task<IActionResult> GeneratePaymentToken(int id)
+    {
+        var token = await _paymentService.GenerateToken(id);
+        if (token.Status == true)
+        {
+            return Ok(token);
+        }
+        return BadRequest(token);
+    }
     // POST : Addpayment
     [HttpPost("MakePayment")]
-    public async Task<IActionResult> MakePayment(int id, [FromForm]MakePaymentDto method)
+    public async Task<IActionResult> MakePayment(int id, MakePaymentDto method)
     {
         var payment = await _paymentService.MakePayment(id, method);
         if (payment.Status == true)

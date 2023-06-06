@@ -32,7 +32,6 @@ public class PaymentService : IPaymentService
     public async Task<BaseResponse> GenerateToken(int id)
     {
         var customer = await _customerRepo.GetByUserId(id);
-
         if(customer != null)
         {
             var getToken = await _paymentTokenRepo.Get(x => x.UserId == id && x.IsDeleted == false);
@@ -65,14 +64,14 @@ public class PaymentService : IPaymentService
             await _email.SendEmail(email);
             return new BaseResponse()
             {
-                Message = "Token Generated Successfull!",
+                Message = "Token Generated Successfully!",
                 Status = true
             };
         }
         return new BaseResponse()
         {
-            Message = "Token Generated Successfull!",
-            Status = true
+            Message = "Unable To Generate Token!",
+            Status = false
         };
     }
     public async Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment)
@@ -200,7 +199,7 @@ public class PaymentService : IPaymentService
                             await _email.SendEmail(adminEmail);
                             return new BaseResponse()
                             {
-                                Message = "Orders Payment Successfull!",
+                                Message = "Orders Payment Successful!",
                                 Status = updateOrder
                             };
                         }
