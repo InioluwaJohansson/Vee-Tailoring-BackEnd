@@ -144,7 +144,7 @@ public class PostService : IPostService
         }
         return new PostResponseModel()
         {
-            Data = GetDetails(post, category, CommentList, staff),
+            Data = null,
             Message = "Unable To Retrieve Post Successfully",
             Status = false
         };

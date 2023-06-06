@@ -7,7 +7,7 @@ public interface IOrderService
 {
     Task<BaseResponse> Create(CreateOrderDto createOrderDto);
     Task<BaseResponse> Update(int id, UpdateOrderDto updateOrderDto);
-    Task<BaseResponse> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment);
+    Task<bool> UpdatePayment(UpdateOrderPaymentCheck updateOrderPayment);
     Task<BaseResponse> AddRemoveFromCart(int id);
     Task<OrderResponseModel> GetOrderById(int id);
     Task<OrdersResponseModel> GetOrderByOrderNo(string OrderNo);
