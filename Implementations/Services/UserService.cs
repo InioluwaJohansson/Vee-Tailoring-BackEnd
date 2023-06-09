@@ -3,6 +3,8 @@ using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Emails;
 using sib_api_v3_sdk.Model;
+using Vee_Tailoring.Models.Enums;
+
 namespace Vee_Tailoring.Implementations.Services;
 
 public class UserService : IUserService
@@ -10,11 +12,13 @@ public class UserService : IUserService
     IUserRepo _repository;
     IRoleRepo _roleRepo;
     IEmailSend _emailSend;
-    public UserService(IUserRepo repository, IRoleRepo roleRepo, IEmailSend emailSend)
+    ITokenService _tokenService;
+    public UserService(IUserRepo repository, IRoleRepo roleRepo, IEmailSend emailSend, ITokenService tokenService)
     {
         _repository = repository;
         _roleRepo = roleRepo;
         _emailSend = emailSend;
+        _tokenService = tokenService;
     }
     public async Task<UserLoginResponse> Login(string email, string password)
     {
@@ -65,6 +69,7 @@ public class UserService : IUserService
                 "/n This link expires in 3 minutes. /n/n Vee Tailoring Management",
             };
             //var response = await _emailSend.SendEmail(sendEmail);
+            var tokenStatus = await GeneratePasswordResetToken(user.Id);
             return new BaseResponse()
             {
                 Message = $"A Password Reset Link Has Been Sent To {email}, {passwordLink}",
@@ -96,15 +101,38 @@ public class UserService : IUserService
             Status = false
         };
     }
-    public async Task<ReCAPCHAResponse> GenerateReCAPCHA()
+    public async Task<BaseResponse> GeneratePasswordResetToken(int id)
     {
-        string Upper = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToUpper();
-        string Lower = Guid.NewGuid().ToString().Replace(" - ", "").Substring(0, 4).ToLower();
-        return new ReCAPCHAResponse
+        var status = await _tokenService.GenerateToken(id, TokenType.ResetPassword);
+        if (status == true)
         {
-            Message = "ReCAPCHA Successfully Generated!",
-            reCAPCHA = Upper + Lower,
-            Status = true,
+            return new BaseResponse()
+            {
+                Message = "Token Generated Successfully!",
+                Status = true
+            };
+        }
+        return new BaseResponse()
+        {
+            Message = "Unable To Generate Token!",
+            Status = false
+        };
+    }
+    public async Task<BaseResponse> CheckPasswordResetToken(int id, string TokenNo)
+    {
+        var status = await _tokenService.CheckToken(id, TokenType.ResetPassword, TokenNo);
+        if (status == true)
+        {
+            return new BaseResponse()
+            {
+                Message = "Token Generated Successfully!",
+                Status = true
+            };
+        }
+        return new BaseResponse()
+        {
+            Message = "Unable To Generate Token!",
+            Status = false
         };
     }
     protected async Task<string> ReCAPCHAImage(string reCAPCHA)

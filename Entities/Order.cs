@@ -7,7 +7,7 @@ public class Order: AuditableEntity
     public string OrderId { get; set; }
     public ClothGender ClothGender { get; set; }
     public int ClothGenderId { get; set; }
-    public ClothCategory ClothType { get; set; }
+    public ClothCategory ClothCategory { get; set; }
     public int ClothCategoryId { get; set; }
     public OrderPerson OrderPerson { get; set; }
     public decimal Price { get; set; }

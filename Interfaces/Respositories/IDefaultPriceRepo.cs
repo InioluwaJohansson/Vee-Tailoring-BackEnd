@@ -6,4 +6,5 @@ public interface IDefaultPriceRepo : IRepo<DefaultPrice>
     Task<DefaultPrice> GetById(int id);
     Task<DefaultPrice> GetDefaultPrice();
     Task<DefaultPrice> GetShippingFees();
+    Task<DefaultPrice> GetStoreTaxes();
 }

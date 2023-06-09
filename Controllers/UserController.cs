@@ -61,11 +61,22 @@ public class UserController : ControllerBase
         }
         return BadRequest(user);
     }
-    // GET : GenerateReCAPCHA
-    [HttpGet("GenerateReCAPCHA")]
-    public async Task<IActionResult> GenerateReCAPCHA()
+    // GET : GeneratePasswordResetToken
+    [HttpGet("GeneratePasswordResetToken")]
+    public async Task<IActionResult> GeneratePasswordResetToken(int id)
     {
-        var user = await _userService.GenerateReCAPCHA();
+        var user = await _userService.GeneratePasswordResetToken(id);
+        if (user.Status == true)
+        {
+            return Ok(user);
+        }
+        return BadRequest(user);
+    }
+    // GET : CheckPasswordResetToken
+    [HttpGet("CheckPasswordResetToken")]
+    public async Task<IActionResult> CheckPasswordResetToken(int id, string TokenNo)
+    {
+        var user = await _userService.CheckPasswordResetToken(id, TokenNo);
         if (user.Status == true)
         {
             return Ok(user);

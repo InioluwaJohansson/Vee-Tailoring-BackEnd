@@ -16,7 +16,7 @@ public class PaymentController : ControllerBase
         _paymentService = paymentService;
     }
     // POST : GenerateToken
-    [HttpPost("GenerateToken")]
+    [HttpPost("GeneratePaymentToken")]
     public async Task<IActionResult> GeneratePaymentToken(int id)
     {
         var token = await _paymentService.GenerateToken(id);

@@ -8,9 +8,9 @@ public interface IOrderRepo : IRepo<Order>
     Task<IList<Order>> GetOrderbyOrderNo(string OrderNo);
     Task<IList<Order>> ListAllOrdersByCustomerId(int Id);
     Task<IList<Order>> ListAllOrdersByCustomerUserId(int id);
+    Task<IList<Order>> ListAllOrdersByCustomerUserIdDate(int id, DateTime startdate, DateTime endDate);
     Task<IList<Order>> ListAllOrdersByCustomerIdIsPaid(int CustomerId, IsPaid IsPaid);
     Task<IList<Order>> GetOrderbyCustomerIdOrderNo(int id, string OrderNo);
-    Task<IList<Order>> ListAllOrdersByCustomerIdIsNotPaid(int id);
     Task<IList<Order>> ListAllOrdersByIsPaid(IsPaid IsPaid);
     Task<IList<Order>> ListAllOrdersByIsCompleted(IsCompleted IsCompleted);
     Task<IList<Order>> ListAllOrdersByStaffId(int Id);
