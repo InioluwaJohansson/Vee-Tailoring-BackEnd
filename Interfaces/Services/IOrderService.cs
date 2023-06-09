@@ -15,6 +15,7 @@ public interface IOrderService
     Task<OrdersResponseModel> GetOrdersByCustomerUserId(int id);
     Task<CartResponseModel> GetCartOrdersByCustomerId(int id);
     Task<OrdersResponseModel> GetOrderByCustomerIdIsPaid(int id, IsPaid IsPaid);
+    Task<OrdersResponseModel> GetOrderByCustomerUserIdDate(int id, DateTime startdate, DateTime endDate);
     Task<OrdersResponseModel> GetOrderByCustomerUserIdOrderNo(int UserId, string OrderNo);
     Task<OrdersResponseModel> GetAllOrdersByIsPaid(IsPaid isPaid);
     Task<OrdersResponseModel> GetAllOrdersByIsCompleted(IsCompleted isCompleted);

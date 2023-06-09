@@ -16,7 +16,7 @@ namespace Vee_Tailoring.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.10")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Vee_Tailoring.Entities.Address", b =>
@@ -113,6 +113,58 @@ namespace Vee_Tailoring.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ArmTypes");
+                });
+
+            modelBuilder.Entity("Vee_Tailoring.Entities.Card", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("CVV")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CardPin")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("LastModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ValidTHRU")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("customerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("customerId");
+
+                    b.ToTable("Card");
                 });
 
             modelBuilder.Entity("Vee_Tailoring.Entities.Category", b =>
@@ -1162,6 +1214,12 @@ namespace Vee_Tailoring.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<decimal>("ShippingFee")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("StoreTaxes")
+                        .HasColumnType("decimal(65,30)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -1424,6 +1482,54 @@ namespace Vee_Tailoring.Migrations
                     b.ToTable("Templates");
                 });
 
+            modelBuilder.Entity("Vee_Tailoring.Entities.Token", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("LastModifiedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("TokenEndTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("TokenNo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("TokenStartTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("TokenType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Token");
+                });
+
             modelBuilder.Entity("Vee_Tailoring.Entities.UserDetails", b =>
                 {
                     b.Property<int>("Id")
@@ -1478,6 +1584,17 @@ namespace Vee_Tailoring.Migrations
                     b.HasIndex("AddressId");
 
                     b.ToTable("UserDetails");
+                });
+
+            modelBuilder.Entity("Vee_Tailoring.Entities.Card", b =>
+                {
+                    b.HasOne("Vee_Tailoring.Entities.Customer", "customer")
+                        .WithMany()
+                        .HasForeignKey("customerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("customer");
                 });
 
             modelBuilder.Entity("Vee_Tailoring.Entities.Collection", b =>
@@ -1572,7 +1689,7 @@ namespace Vee_Tailoring.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Vee_Tailoring.Entities.ClothCategory", "ClothType")
+                    b.HasOne("Vee_Tailoring.Entities.ClothCategory", "ClothCategory")
                         .WithMany()
                         .HasForeignKey("ClothCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1634,9 +1751,9 @@ namespace Vee_Tailoring.Migrations
 
                     b.Navigation("ArmType");
 
-                    b.Navigation("ClothGender");
+                    b.Navigation("ClothCategory");
 
-                    b.Navigation("ClothType");
+                    b.Navigation("ClothGender");
 
                     b.Navigation("Color");
 

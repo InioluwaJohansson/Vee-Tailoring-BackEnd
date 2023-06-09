@@ -24,4 +24,8 @@ public class DefaultPriceRepo : BaseRepository<DefaultPrice>, IDefaultPriceRepo
     {
         return await context.DefaultPrices.SingleOrDefaultAsync(c => c.Id == 2 && c.IsDeleted == false);
     }
+    public async Task<DefaultPrice> GetStoreTaxes()
+    {
+        return await context.DefaultPrices.SingleOrDefaultAsync(c => c.Id == 3 && c.IsDeleted == false);
+    }
 }

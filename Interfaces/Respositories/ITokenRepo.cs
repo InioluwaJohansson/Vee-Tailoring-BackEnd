@@ -3,6 +3,6 @@ using Vee_Tailoring.Entities;
 
 namespace Vee_Tailoring.Interfaces.Respositories;
 
-public interface IPaymentTokenRepo : IRepo<PaymentToken>
+public interface ITokenRepo : IRepo<Token>
 {
 }

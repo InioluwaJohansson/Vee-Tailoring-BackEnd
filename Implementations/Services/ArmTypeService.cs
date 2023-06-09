@@ -60,12 +60,12 @@ public class ArmTypeService : IArmTypeService
     }
     public async Task<ArmTypeResponseModel> GetById(int id)
     {
-        var clothCategory = await _repository.GetById(id);
-        if (clothCategory != null)
+        var armType = await _repository.GetById(id);
+        if (armType != null)
         {
             return new ArmTypeResponseModel()
             {
-                Data = GetDetails(clothCategory),
+                Data = GetDetails(armType),
                 Message = "Arm Length Found",
                 Status = true
             };
@@ -76,7 +76,7 @@ public class ArmTypeService : IArmTypeService
             Message = "Arm Length Found",
             Status = true
         };
-     }
+    }
     public async Task<ArmTypesResponseModel> GetAllArmType()
     {
         var armTypes = await _repository.List();
@@ -91,7 +91,7 @@ public class ArmTypeService : IArmTypeService
         return new ArmTypesResponseModel()
         {
             Data = null,
-            Message = "No ArmTypes Has",
+            Message = "No ArmTypes",
             Status = false
         };
     }

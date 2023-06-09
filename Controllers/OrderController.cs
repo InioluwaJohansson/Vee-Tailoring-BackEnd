@@ -125,6 +125,18 @@ public class OrderController : Controller
         return BadRequest(order);
     }
 
+    // GET : GetOrderByCustomerIdDate
+    [HttpGet("GetOrderByCustomerIdIsPaid")]
+    public async Task<IActionResult> GetOrderByCustomerUserIdDate(int id, DateTime startdate, DateTime endDate)
+    {
+        var order = await _orderService.GetOrderByCustomerUserIdDate(id, startdate, endDate);
+        if (order.Status == true)
+        {
+            return Ok(order);
+        }
+        return BadRequest(order);
+    }
+
     // GET : GetOrderByCustomerIdOrderNo
     [HttpGet("GetOrderByCustomerIdOrderNo")]
     public async Task<IActionResult> GetOrderByCustomerUserIdIsOrderNo(int customerId, string OrderNo)

@@ -17,62 +17,37 @@ public class PaymentService : IPaymentService
     ICustomerRepo _customerRepo;
     IOrderRepo _orderRepo;
     IEmailSend _email;
-    IPaymentTokenRepo _paymentTokenRepo;
+    ITokenService _tokenService;
+    IDefaultPriceRepo _defaultPriceRepo;
+    ICardRepo _cardRepo;
     IConfiguration _configuration;
-    public PaymentService(IPaymentRepo repository, IOrderService orderService, ICustomerRepo customerRepo, IOrderRepo orderRepo, IPaymentTokenRepo paymentTokenRepo, IEmailSend email, IConfiguration configuration)
+    public PaymentService(IPaymentRepo repository, IOrderService orderService, ICustomerRepo customerRepo, IOrderRepo orderRepo, ITokenService tokenService, IDefaultPriceRepo defaultPriceRepo, IEmailSend email, ICardRepo cardRepo, IConfiguration configuration)
     {
         _repository = repository;
         _orderService = orderService;
         _customerRepo = customerRepo;
         _orderRepo = orderRepo;
         _email = email;
-        _paymentTokenRepo = paymentTokenRepo;
+        _tokenService = tokenService;
+        _defaultPriceRepo = defaultPriceRepo;
+        _cardRepo = cardRepo;
         _configuration = configuration;
     }
     public async Task<BaseResponse> GenerateToken(int id)
     {
-        var customer = await _customerRepo.GetByUserId(id);
-
-        if(customer != null)
+        var status = await _tokenService.GenerateToken(id, TokenType.Payment);
+        if (status == true)
         {
-            var getToken = await _paymentTokenRepo.Get(x => x.UserId == id && x.IsDeleted == false);
-            if(getToken != null)
-            {
-                getToken.IsDeleted = true;
-                await _paymentTokenRepo.Update(getToken);
-            }
-            var generateToken = Guid.NewGuid().ToString().Substring(0, 15);
-            while ((await _paymentTokenRepo.Get(x => x.Token == generateToken)).Token == generateToken)
-            {
-                generateToken = Guid.NewGuid().ToString().Substring(0, 15);
-            }
-            var token = new PaymentToken()
-            {
-                Token = BCrypt.Net.BCrypt.HashPassword(generateToken),
-                TokenStartTime = DateTime.Now,
-                TokenEndTime = DateTime.Now.AddMinutes(3.0),
-            };
-            await _paymentTokenRepo.Create(token);
-            var email = new CreateEmailDto()
-            {
-                Subject = "Payment Token",
-                ReceiverName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
-                ReceiverEmail = customer.User.Email,
-                Message = $"Payment Token Generated! /n" +
-                $"Use the token below to initiate your recent payment. /n" +
-                $"{generateToken} /n" + "This token expires in 3 minutes." + "Vee Tailoring"
-            };
-            await _email.SendEmail(email);
             return new BaseResponse()
             {
-                Message = "Token Generated Successfull!",
+                Message = "Token Generated Successfully!",
                 Status = true
             };
         }
         return new BaseResponse()
         {
-            Message = "Token Generated Successfull!",
-            Status = true
+            Message = "Unable To Generate Token!",
+            Status = false
         };
     }
     public async Task<BaseResponse> MakePayment(int id, MakePaymentDto makePayment)
@@ -80,12 +55,9 @@ public class PaymentService : IPaymentService
         var customer = await _customerRepo.GetByUserId(id);
         if (customer != null)
         {
-            var token = await _paymentTokenRepo.Get(x => x.UserId == id && x.IsDeleted == false);
-            if (token != null && BCrypt.Net.BCrypt.Verify(makePayment.Token, token.Token) && token.TokenStartTime < DateTime.Now && DateTime.Now < token.TokenEndTime)
+            var token = await _tokenService.CheckToken(id, TokenType.Payment, makePayment.Token);
+            if (token == true)
             {
-                token.IsDeleted = true;
-                await _paymentTokenRepo.Update(token);
-
                 var cart = await _orderService.GetCartOrdersByCustomerId(id);
                 if (cart != null && customer != null)
                 {
@@ -112,49 +84,54 @@ public class PaymentService : IPaymentService
                     }
                     if (makePayment.paymentMethod == PaymentMethod.MasterCard)
                     {
-                        var url = "https://api.paystack.co/transaction/initialize";
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
-                        // Set up your API credentials
-
-                        // Configure the API credentials
-                        /*
-                        Configuration.SetApiKey(_configuration["MasterCard:ApiKey"]);
-                        Configuration.SetApiSecret(_configuration["MasterCard:ApiSecret"]);
-                        Configuration.SetSandbox(_configuration["MasterCard:NotLive"]); // Use true for sandbox/testing, false for production
-
-                        // Create a new checkout session
-                        var checkoutSession = CheckoutApi.CreateSession(merchantId, new SessionRequest
+                        var card = await _cardRepo.Get(x => x.Id == makePayment.CardId && x.UserId == id && x.IsDeleted == false);
+                        if(card != null)
                         {
-                            ApiOperation = "CREATE_CHECKOUT_SESSION",
-                            Order = new Order
-                            {
-                                Amount = 1000,
-                                Currency = "USD",
-                                Reference = "YourOrderReference"
-                            },
-                            Interaction = new Interaction
-                            {
-                                ReturnUrl = "https://your-website.com/checkout/complete"
-                            }
-                        });
+                            var url = "https://api.paystack.co/transaction/initialize";
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
+                            // Set up your API credentials
 
-                        // Access the session ID
-                        var sessionId = checkoutSession.Session.Id;
-                        */
-                        var content = new StringContent(JsonSerializer.Serialize(new
-                        {
-                            currency = "USD",
-                            pin = makePayment.CardPin,
-                            validFrom = makePayment.ValidFrom,
-                            untilEnd = makePayment.UntilEnd,
-                            cvv = makePayment.CVV,
-                            amount = cart.Data.TotalPrice,
-                            email = customer.User.Email,
-                            referenceNumber = generateRef
-                        }), Encoding.UTF8, "application/json");
-                        catchresponse = await client.PostAsync(url, content);
-                        var reString = await catchresponse.Content.ReadAsStringAsync();
-                        var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
+                            // Configure the API credentials
+                            /*
+                            Configuration.SetApiKey(_configuration["MasterCard:ApiKey"]);
+                            Configuration.SetApiSecret(_configuration["MasterCard:ApiSecret"]);
+                            Configuration.SetSandbox(_configuration["MasterCard:NotLive"]); // Use true for sandbox/testing, false for production
+
+                            // Create a new checkout session
+                            var checkoutSession = CheckoutApi.CreateSession(merchantId, new SessionRequest
+                            {
+                                ApiOperation = "CREATE_CHECKOUT_SESSION",
+                                Order = new Order
+                                {
+                                    Amount = 1000,
+                                    Currency = "USD",
+                                    Reference = "YourOrderReference"
+                                },
+                                Interaction = new Interaction
+                                {
+                                    ReturnUrl = "https://your-website.com/checkout/complete"
+                                }
+                            });
+
+                            // Access the session ID
+                            var sessionId = checkoutSession.Session.Id;
+                            */
+                            var content = new StringContent(JsonSerializer.Serialize(new
+                            {
+                                currency = "USD",
+                                pin = card.CardPin,
+                                validFrom = card.ValidTHRU,
+                                untilEnd = card,
+                                cvv = card.CVV,
+                                amount = cart.Data.TotalPrice,
+                                email = customer.User.Email,
+                                referenceNumber = generateRef
+                            }), Encoding.UTF8, "application/json");
+                            catchresponse = await client.PostAsync(url, content);
+                            var reString = await catchresponse.Content.ReadAsStringAsync();
+                            var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
+                        }
+                        
                     }
                     if (catchresponse.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -167,6 +144,8 @@ public class PaymentService : IPaymentService
                         var pay = new Payment()
                         {
                             AmountPaid = cart.Data.TotalPrice,
+                            ShippingFee = (await _defaultPriceRepo.GetShippingFees()).Price,
+                            StoreTaxes = (await _defaultPriceRepo.GetStoreTaxes()).Price,
                             CustomerId = customer.Id,
                             ReferenceNumber = generateRef,
                             DateOfPayment = DateTime.UtcNow,
@@ -200,7 +179,7 @@ public class PaymentService : IPaymentService
                             await _email.SendEmail(adminEmail);
                             return new BaseResponse()
                             {
-                                Message = "Orders Payment Successfull!",
+                                Message = "Orders Payment Successful!",
                                 Status = updateOrder
                             };
                         }
@@ -304,6 +283,32 @@ public class PaymentService : IPaymentService
             Status = true
         };
     }
+    public async Task<PaymentsResponseModel> GetAllPaymentsByCustomerDateRange(int id, DateTime startDate, DateTime endDate)
+    {
+        var payments = await _repository.GetByExpression(x => x.Customer.User.Id == id && x.DateOfPayment >= startDate && x.DateOfPayment <= endDate && x.IsDeleted == false);
+        if (payments != null)
+        {
+            List<GetPaymentDto> PaymentList = new List<GetPaymentDto>();
+            foreach (var payment in payments)
+            {
+                var customer = await _customerRepo.GetById(payment.CustomerId);
+                var order = await _orderRepo.ListAllOrdersByCustomerId(payment.CustomerId);
+                PaymentList.Add(GetDetails(payment, customer, order));
+            }
+            return new PaymentsResponseModel()
+            {
+                Data = PaymentList,
+                Message = "Orders Payments Found",
+                Status = true
+            };
+        }
+        return new PaymentsResponseModel()
+        {
+            Data = null,
+            Message = "Unable To Retieve Payments Successfully",
+            Status = true
+        };
+    }
     public async Task<PaymentsResponseModel> GetAllPayments()
     {
         var payments = await _repository.GetByExpression(x => x.IsDeleted == false);
@@ -315,6 +320,32 @@ public class PaymentService : IPaymentService
                 var customer = await _customerRepo.GetById(payment.CustomerId);
                 var order = await _orderRepo.ListAllOrdersByCustomerId(payment.CustomerId);
                 PaymentList.Add(GetDetails(payment,customer, order));
+            }
+            return new PaymentsResponseModel()
+            {
+                Data = PaymentList,
+                Message = "Orders Payments Found",
+                Status = true
+            };
+        }
+        return new PaymentsResponseModel()
+        {
+            Data = null,
+            Message = "Unable To Retieve Payments Successfully",
+            Status = false
+        };
+    }
+    public async Task<PaymentsResponseModel> GetAllPaymentsDateRange(DateTime startDate, DateTime endDate)
+    {
+        var payments = (await _repository.GetByExpression(x => x.DateOfPayment >= startDate && x.DateOfPayment <= endDate && x.IsDeleted == false)).OrderByDescending(x => x.DateOfPayment);
+        if (payments != null)
+        {
+            List<GetPaymentDto> PaymentList = new List<GetPaymentDto>();
+            foreach (var payment in payments)
+            {
+                var customer = await _customerRepo.GetById(payment.CustomerId);
+                var order = await _orderRepo.ListAllOrdersByCustomerId(payment.CustomerId);
+                PaymentList.Add(GetDetails(payment, customer, order));
             }
             return new PaymentsResponseModel()
             {
@@ -344,6 +375,7 @@ public class PaymentService : IPaymentService
             .Replace("$NAME", $"{getinvoice.Customer.UserDetails.FirstName} {getinvoice.Customer.UserDetails.LastName}")
             .Replace("$AMOUNT", $"{getinvoice.AmountPaid}")
             .Replace("SHIPPINGFEE", $"{getinvoice.ShippingFee}")
+            .Replace("STORETAXES", $"{getinvoice.StoreTaxes}")
             .Replace("$EMAIL", $"{getinvoice.Customer.User.Email}")
             .Replace("$NUMBERLINE", $"{getinvoice.Customer.UserDetails.Address.NumberLine}, {getinvoice.Customer.UserDetails.Address.Street},")
             .Replace("$CITY", $"{getinvoice.Customer.UserDetails.Address.City},")
@@ -369,6 +401,7 @@ public class PaymentService : IPaymentService
                 ReferenceNo = getinvoice.ReferenceNumber,
                 AmountPaid = getinvoice.AmountPaid,
                 ShippingFee = getinvoice.ShippingFee,
+                StoreTaxes = getinvoice.StoreTaxes,
                 DateOfPayment = getinvoice.DateOfPayment,
                 Email = getinvoice.Customer.User.Email,
                 FirstName = $"{getinvoice.Customer.UserDetails.FirstName} {getinvoice.Customer.UserDetails.LastName}",
@@ -430,6 +463,7 @@ public class PaymentService : IPaymentService
             Id = payment.Id,
             AmountPaid = payment.AmountPaid,
             ShippingFee = payment.ShippingFee,
+            StoreTaxes = payment.StoreTaxes,
             ReferenceNo = payment.ReferenceNumber,
             DateOfPayment = payment.DateOfPayment,
             customerDto = new GetCustomerDto()

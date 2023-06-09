@@ -4,6 +4,7 @@ using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
+using System.Runtime.InteropServices;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -179,19 +180,9 @@ public class OrderService : IOrderService
         var order = await _repository.GetOrderById(id);
         if(order != null)
         {
-            var style = await _stylerepository.GetById(order.StyleId);
-            var pattern = await _patternrepository.GetById(order.PatternId);
-            var armType = await _armTyperepository.GetById(order.ArmTypeId);
-            var color = await _colorrepository.GetById(order.ColorId);
-            var material = await _materialrepository.GetById(order.MaterialId);
-            var clothCategory = await _clothCategoryrepository.GetById(order.ClothCategoryId);
-            var clothGender = await _clothGenderrepository.GetById(order.ClothGenderId);
-            var customer = await _customerrepository.GetById(order.CustomerId);
-            var staff = await _staffrepository.GetById(order.StaffId);
-            var price = await _defaultPricerepository.GetDefaultPrice();
             return new OrderResponseModel()
             {
-                Data = GetDetails(order, style, pattern, material, color, armType, clothCategory, clothGender,price, customer, staff),
+                Data = await GetDetails(order),
                 Message = "Order Retrieved Successfully",
                 Status = true
             };
@@ -209,20 +200,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -243,20 +221,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -277,20 +242,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -302,7 +254,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetAllAssignedOrders()
@@ -311,20 +263,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -336,7 +275,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetAllUnAssignedOrders()
@@ -345,20 +284,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -370,7 +296,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetAllOrdersByIsCompleted(IsCompleted isCompleted)
@@ -379,20 +305,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -404,7 +317,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetAllOrdersByIsPaid(IsPaid isPaid)
@@ -413,20 +326,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -438,7 +338,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrdersByCustomerId(int id)
@@ -447,20 +347,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -472,7 +359,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrdersByCustomerUserId(int id)
@@ -481,20 +368,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -506,38 +380,22 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<CartResponseModel> GetCartOrdersByCustomerId(int id)
     {
-        var Orders = await _repository.ListAllOrdersByCustomerIdIsNotPaid(id);
+        var Orders = await _repository.ListAllOrdersByCustomerIdIsPaid(id, IsPaid.NotPaid);
         if (Orders.Where(c => c.AddToCart == true) != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
             decimal totalOrderPrice = 0;
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                var Details = GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff);
-                OrderList.Add(Details);
-                totalOrderPrice += Details.Price;
-            }
-            var shippingFees = await _defaultPricerepository.GetShippingFees();
+            foreach (var Order in Orders)   OrderList.Add(await GetDetails(Order));
+            foreach (var Order in OrderList)    totalOrderPrice += Order.Price;
             var cartDto = new GetCartDto()
             {
                 GetOrderDtos = OrderList,
-                Price = shippingFees.Price,
-                TotalPrice = totalOrderPrice + shippingFees.Price,
+                TotalPrice = totalOrderPrice,
             };
             return new CartResponseModel()
             {
@@ -550,7 +408,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Cart Is Empty",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrderByCustomerIdIsPaid(int id, IsPaid IsPaid)
@@ -559,20 +417,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -584,7 +429,28 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
+        };
+    }
+    public async Task<OrdersResponseModel> GetOrderByCustomerUserIdDate(int id, DateTime startdate, DateTime endDate)
+    {
+        var Orders = await _repository.ListAllOrdersByCustomerUserIdDate(id, startdate, endDate);
+        if (Orders != null)
+        {
+            List<GetOrderDto> OrderList = new List<GetOrderDto>();
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
+            return new OrdersResponseModel()
+            {
+                Data = OrderList,
+                Message = "Orders List Retrieved Successfully",
+                Status = true
+            };
+        }
+        return new OrdersResponseModel()
+        {
+            Data = null,
+            Message = "Unable To Retrieve Orders List Successfully",
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrdersByStaffId(int id)
@@ -593,20 +459,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -618,7 +471,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrdersByStaffUserId(int id)
@@ -627,20 +480,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -652,7 +492,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<OrdersResponseModel> GetOrdersByStaffIdIsCompleted(int id, IsCompleted IsCompleted)
@@ -661,20 +501,7 @@ public class OrderService : IOrderService
         if (Orders != null)
         {
             List<GetOrderDto> OrderList = new List<GetOrderDto>();
-            foreach (var Order in Orders)
-            {
-                var style = await _stylerepository.GetById(Order.StyleId);
-                var pattern = await _patternrepository.GetById(Order.PatternId);
-                var armType = await _armTyperepository.GetById(Order.ArmTypeId);
-                var color = await _colorrepository.GetById(Order.ColorId);
-                var material = await _materialrepository.GetById(Order.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(Order.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(Order.ClothGenderId);
-                var customer = await _customerrepository.GetById(Order.CustomerId);
-                var staff = await _staffrepository.GetById(Order.StaffId);
-                var price = await _defaultPricerepository.GetDefaultPrice();
-                OrderList.Add(GetDetails(Order, style, pattern, material, color, armType, clothCategory, clothGender, price, customer, staff));
-            }
+            foreach (var Order in Orders) OrderList.Add(await GetDetails(Order));
             return new OrdersResponseModel()
             {
                 Data = OrderList,
@@ -686,7 +513,7 @@ public class OrderService : IOrderService
         {
             Data = null,
             Message = "Unable To Retrieve Orders List Successfully",
-            Status = true
+            Status = false
         };
     }
     public async Task<BaseResponse> AssignAnOrder(int id, int staffId, DateTime completionTime)
@@ -719,34 +546,35 @@ public class OrderService : IOrderService
             Status = false
         };
     }
-    public GetOrderDto GetDetails(Order order, Style style, Pattern pattern, Material material, Color color, ArmType armType, ClothCategory clothCategory, ClothGender clothGender, DefaultPrice defaultPrice, Customer customer, Staff staff)
+    public async Task<GetOrderDto> GetDetails(Order order)
     {
         decimal price = 0;
         string completionDate = "";
+        var defaultPrice = await _defaultPricerepository.GetDefaultPrice();
         if (order.IsPaid == IsPaid.Paid)
         {
             price = order.Price;
         }
         else
         {
-            decimal measurementPrice = (Decimal.Parse(customer.Measurements.AnkleSize) + 
-                Decimal.Parse(customer.Measurements.ArmLength) +
-                Decimal.Parse(customer.Measurements.ArmSize) +
-                Decimal.Parse(customer.Measurements.BackWaist) + 
-                Decimal.Parse(customer.Measurements.BodyHeight) + 
-                Decimal.Parse(customer.Measurements.BurstGirth) + 
-                Decimal.Parse(customer.Measurements.FrontWaist) + 
-                Decimal.Parse(customer.Measurements.Head) + 
-                Decimal.Parse(customer.Measurements.HighHips) + 
-                Decimal.Parse(customer.Measurements.HipSize) + 
-                Decimal.Parse(customer.Measurements.LegLength) + 
-                Decimal.Parse(customer.Measurements.NeckSize) + 
-                Decimal.Parse(customer.Measurements.ShoulderWidth) + 
-                Decimal.Parse(customer.Measurements.ThirdQuarterLegLength) + 
-                Decimal.Parse(customer.Measurements.WaistSize) + 
-                Decimal.Parse(customer.Measurements.WristCircumfrence)
+            decimal measurementPrice = (Decimal.Parse(order.Customer.Measurements.AnkleSize) + 
+                Decimal.Parse(order.Customer.Measurements.ArmLength) +
+                Decimal.Parse(order.Customer.Measurements.ArmSize) +
+                Decimal.Parse(order.Customer.Measurements.BackWaist) + 
+                Decimal.Parse(order.Customer.Measurements.BodyHeight) + 
+                Decimal.Parse(order.Customer.Measurements.BurstGirth) + 
+                Decimal.Parse(order.Customer.Measurements.FrontWaist) + 
+                Decimal.Parse(order.Customer.Measurements.Head) + 
+                Decimal.Parse(order.Customer.Measurements.HighHips) + 
+                Decimal.Parse(order.Customer.Measurements.HipSize) + 
+                Decimal.Parse(order.Customer.Measurements.LegLength) + 
+                Decimal.Parse(order.Customer.Measurements.NeckSize) + 
+                Decimal.Parse(order.Customer.Measurements.ShoulderWidth) + 
+                Decimal.Parse(order.Customer.Measurements.ThirdQuarterLegLength) + 
+                Decimal.Parse(order.Customer.Measurements.WaistSize) + 
+                Decimal.Parse(order.Customer.Measurements.WristCircumfrence)
                 ) * defaultPrice.Price;
-            price = (measurementPrice + style.StylePrice + pattern.PatternPrice + material.MaterialPrice) * order.Pieces;
+            price = (measurementPrice + order.Style.StylePrice + order.Pattern.PatternPrice + order.Material.MaterialPrice) * order.Pieces;
         }
         if (order.CompletionTime.CompareTo(DateTime.Today) <= 0 && order.IsPaid == IsPaid.Paid)
         {
@@ -774,55 +602,55 @@ public class OrderService : IOrderService
             CompletionTime = completionDate,
             GetStyleDto = new GetStyleDto()
             {
-                StyleId = style.StyleId,
-                StyleName = style.StyleName,
-                StyleUrl = style.StyleUrl,
-                StylePrice = style.StylePrice,
+                StyleId = order.Style.StyleId,
+                StyleName = order.Style.StyleName,
+                StyleUrl = order.Style.StyleUrl,
+                StylePrice = order.Style.StylePrice,
                 GetClothCategoryDto = new GetClothCategoryDto()
                 {
-                    Id = clothCategory.Id,
-                    ClothName = clothCategory.ClothName
+                    Id = order.ClothCategory.Id,
+                    ClothName = order.ClothCategory.ClothName
                 },
                 GetClothGenderDto = new GetClothGenderDto()
                 {
-                    Id = clothGender.Id,
-                    Gender = clothGender.Gender,
+                    Id = order.ClothGender.Id,
+                    Gender = order.ClothGender.Gender,
                 }
             },
             GetPatternDto = new GetPatternDto()
             {
-                Id = pattern.Id,
-                PatternName = pattern.PatternName,
-                PatternUrl = pattern.PatternUrl,
-                PatternPrice = pattern.PatternPrice,
+                Id = order.Pattern.Id,
+                PatternName = order.Pattern.PatternName,
+                PatternUrl = order.Pattern.PatternUrl,
+                PatternPrice = order.Pattern.PatternPrice,
                 GetClothCategoryDto = new GetClothCategoryDto()
                 {
-                    Id = clothCategory.Id,
-                    ClothName = clothCategory.ClothName
+                    Id = order.ClothCategory.Id,
+                    ClothName = order.ClothCategory.ClothName
                 },
                 GetClothGenderDto = new GetClothGenderDto()
                 {
-                    Id = clothGender.Id,
-                    Gender = clothGender.Gender,
+                    Id = order.ClothGender.Id,
+                    Gender = order.ClothGender.Gender,
                 }
             },
             GetMaterialDto = new GetMaterialDto()
             {
-                Id = material.Id,
-                MaterialName = material.MaterialName,
-                MaterialUrl = material.MaterialUrl,
-                MaterialPrice = material.MaterialPrice,
+                Id = order.Material.Id,
+                MaterialName = order.Material.MaterialName,
+                MaterialUrl = order.Material.MaterialUrl,
+                MaterialPrice = order.Material.MaterialPrice,
             },
             GetColorDto = new GetColorDto()
             {
-                Id = color.Id,
-                ColorName = color.ColorName,
-                ColorCode = color.ColorCode,
+                Id = order.Color.Id,
+                ColorName = order.Color.ColorName,
+                ColorCode = order.Color.ColorCode,
             },
             GetArmTypeDto = new GetArmTypeDto()
             {
-                Id = armType.Id,
-                ArmLength = armType.ArmLength
+                Id = order.ArmType.Id,
+                ArmLength = order.ArmType.ArmLength
             },
             GetOrderAddressDto = new GetOrderAddressDto()
             {
@@ -855,79 +683,70 @@ public class OrderService : IOrderService
             },
             GetCustomerDto = new GetCustomerDto()
             {
-                Id = customer.Id,
-                CustomerNo = customer.CustomerNo,
-                Email = customer.User.Email,
+                Id = order.Customer.Id,
+                CustomerNo = order.Customer.CustomerNo,
+                Email = order.Customer.User.Email,
                 GetUserDetailsDto = new GetUserDetailsDto()
                 {
-                    FirstName = customer.UserDetails.FirstName,
-                    LastName = customer.UserDetails.LastName,
-                    ImageUrl = customer.UserDetails.ImageUrl,
-                    Gender = customer.UserDetails.Gender,
-                    PhoneNumber = customer.UserDetails.PhoneNumber,
+                    FirstName = order.Customer.UserDetails.FirstName,
+                    LastName = order.Customer.UserDetails.LastName,
+                    ImageUrl = order.Customer.UserDetails.ImageUrl,
+                    Gender = order.Customer.UserDetails.Gender,
+                    PhoneNumber = order.Customer.UserDetails.PhoneNumber,
                     GetAddressDto = new GetAddressDto()
                     {
-                        NumberLine = customer.UserDetails.Address.NumberLine,
-                        Street = customer.UserDetails.Address.Street,
-                        City = customer.UserDetails.Address.City,
-                        Region = customer.UserDetails.Address.Region,
-                        State = customer.UserDetails.Address.State,
-                        Country = customer.UserDetails.Address.Country,
+                        NumberLine = order.Customer.UserDetails.Address.NumberLine,
+                        Street = order.Customer.UserDetails.Address.Street,
+                        City = order.Customer.UserDetails.Address.City,
+                        Region = order.Customer.UserDetails.Address.Region,
+                        State = order.Customer.UserDetails.Address.State,
+                        Country = order.Customer.UserDetails.Address.Country,
                     }
                 },
                 GetMeasurementDto = new GetMeasurementDto()
                 {
-                    AnkleSize = Decimal.Parse(customer.Measurements.AnkleSize),
-                    ArmLength = Decimal.Parse(customer.Measurements.ArmLength),
-                    ArmSize = Decimal.Parse(customer.Measurements.ArmSize),
-                    BackWaist = Decimal.Parse(customer.Measurements.BackWaist),
-                    BodyHeight = Decimal.Parse(customer.Measurements.BodyHeight),
-                    BurstGirth = Decimal.Parse(customer.Measurements.BurstGirth),
-                    FrontWaist = Decimal.Parse(customer.Measurements.FrontWaist),
-                    Head = Decimal.Parse(customer.Measurements.Head),
-                    HighHips = Decimal.Parse(customer.Measurements.HighHips),
-                    HipSize = Decimal.Parse(customer.Measurements.HipSize),
-                    LegLength = Decimal.Parse(customer.Measurements.LegLength),
-                    NeckSize = Decimal.Parse(customer.Measurements.NeckSize),
-                    ShoulderWidth = Decimal.Parse(customer.Measurements.ShoulderWidth),
-                    ThirdQuarterLegLength = Decimal.Parse(customer.Measurements.ThirdQuarterLegLength),
-                    WaistSize = Decimal.Parse(customer.Measurements.WaistSize),
-                    WristCircumfrence = Decimal.Parse(customer.Measurements.WristCircumfrence),
+                    AnkleSize = Decimal.Parse(order.Customer.Measurements.AnkleSize),
+                    ArmLength = Decimal.Parse(order.Customer.Measurements.ArmLength),
+                    ArmSize = Decimal.Parse(order.Customer.Measurements.ArmSize),
+                    BackWaist = Decimal.Parse(order.Customer.Measurements.BackWaist),
+                    BodyHeight = Decimal.Parse(order.Customer.Measurements.BodyHeight),
+                    BurstGirth = Decimal.Parse(order.Customer.Measurements.BurstGirth),
+                    FrontWaist = Decimal.Parse(order.Customer.Measurements.FrontWaist),
+                    Head = Decimal.Parse(order.Customer.Measurements.Head),
+                    HighHips = Decimal.Parse(order.Customer.Measurements.HighHips),
+                    HipSize = Decimal.Parse(order.Customer.Measurements.HipSize),
+                    LegLength = Decimal.Parse(order.Customer.Measurements.LegLength),
+                    NeckSize = Decimal.Parse(order.Customer.Measurements.NeckSize),
+                    ShoulderWidth = Decimal.Parse(order.Customer.Measurements.ShoulderWidth),
+                    ThirdQuarterLegLength = Decimal.Parse(order.Customer.Measurements.ThirdQuarterLegLength),
+                    WaistSize = Decimal.Parse(order.Customer.Measurements.WaistSize),
+                    WristCircumfrence = Decimal.Parse(order.Customer.Measurements.WristCircumfrence),
                 }
             },
             GetStaffDto = new GetStaffDto()
             {
-                Id = staff.Id,
-                StaffNo = staff.StaffNo,
-                Email = staff.User.Email,
+                Id = order.Staff.Id,
+                StaffNo = order.Staff.StaffNo,
+                Email = order.Staff.User.Email,
                 GetUserDetailsDto = new GetUserDetailsDto()
                 {
-                    FirstName = staff.UserDetails.FirstName,
-                    LastName = staff.UserDetails.LastName,
-                    ImageUrl = staff.UserDetails.ImageUrl,
-                    Gender = staff.UserDetails.Gender,
-                    PhoneNumber = staff.UserDetails.PhoneNumber,
+                    FirstName = order.Staff.UserDetails.FirstName,
+                    LastName = order.Staff.UserDetails.LastName,
+                    ImageUrl = order.Staff.UserDetails.ImageUrl,
+                    Gender = order.Staff.UserDetails.Gender,
+                    PhoneNumber = order.Staff.UserDetails.PhoneNumber,
                     GetAddressDto = new GetAddressDto()
                     {
-                        NumberLine = staff.UserDetails.Address.NumberLine,
-                        Street = staff.UserDetails.Address.Street,
-                        City = staff.UserDetails.Address.City,
-                        Region = staff.UserDetails.Address.Region,
-                        State = staff.UserDetails.Address.State,
-                        Country = staff.UserDetails.Address.Country,
+                        NumberLine = order.Staff.UserDetails.Address.NumberLine,
+                        Street = order.Staff.UserDetails.Address.Street,
+                        City = order.Staff.UserDetails.Address.City,
+                        Region = order.Staff.UserDetails.Address.Region,
+                        State = order.Staff.UserDetails.Address.State,
+                        Country = order.Staff.UserDetails.Address.Country,
                     }
                 }
             }
         };
-    }
-    public string GetOrderNos(CartResponseModel cart)
-    {
-        string orderString = "";
-        foreach (var order in cart.Data.GetOrderDtos)
-        {
-            orderString += $"{order.OrderId.Take(5)} /n";
-        }
-        return orderString;
     }
     public async Task<OrderDashboard> OrdersDashboard()
     {
