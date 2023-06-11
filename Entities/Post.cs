@@ -13,6 +13,5 @@ public class Post: AuditableEntity
     public int Likes { get; set; }
     public Staff Staff { get; set; }
     public int StaffId  { get; set; }
-    public bool IsApproved { get; set; }
-    public List<Comment> Comments { get; set; } = new List<Comment>();
+    public bool IsApproved { get; set; } = false;
 }

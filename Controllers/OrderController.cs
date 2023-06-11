@@ -126,7 +126,7 @@ public class OrderController : Controller
     }
 
     // GET : GetOrderByCustomerIdDate
-    [HttpGet("GetOrderByCustomerIdIsPaid")]
+    [HttpGet("GetOrderByCustomerIdIsPaidDate")]
     public async Task<IActionResult> GetOrderByCustomerUserIdDate(int id, DateTime startdate, DateTime endDate)
     {
         var order = await _orderService.GetOrderByCustomerUserIdDate(id, startdate, endDate);

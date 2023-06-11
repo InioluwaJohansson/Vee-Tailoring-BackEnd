@@ -1,4 +1,5 @@
-﻿using Vee_Tailoring.Entities;
+﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using Vee_Tailoring.Entities;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Models.DTOs;
@@ -7,13 +8,9 @@ namespace Vee_Tailoring.Implementations.Services;
 public class StyleService : IStyleService
 {
     IStyleRepo _repository;
-    IClothGenderRepo _clothGenderRepo;
-    IClothCategoryRepo _clothCategoryRepo;
-    public StyleService(IStyleRepo repository, IClothGenderRepo clothGenderRepo, IClothCategoryRepo clothCategoryRepo)
+    public StyleService(IStyleRepo repository)
     {
         _repository = repository;
-        _clothGenderRepo = clothGenderRepo;
-        _clothCategoryRepo = clothCategoryRepo;
     }
     public async Task<BaseResponse> Create(CreateStyleDto createStyleDto)
     {
@@ -105,11 +102,9 @@ public class StyleService : IStyleService
         var Style = await _repository.GetById(id);
         if (Style != null)
         {
-            var gender = await _clothGenderRepo.GetById(Style.ClothGenderId);
-            var category = await _clothCategoryRepo.GetById(Style.ClothCategoryId);
             return new StyleResponseModel()
             {
-                Data = GetDetails(Style, gender, category),
+                Data = GetDetails(Style),
                 Message = "Style Retrieved Successfully",
                 Status = true
             };
@@ -126,16 +121,11 @@ public class StyleService : IStyleService
         var Styles = await _repository.GetByStyleName(styleName);
         if (Styles != null)
         {
-            List<GetStyleDto> PatternList = new List<GetStyleDto>();
-            foreach (var Style in Styles)
-            {
-                var gender = await _clothGenderRepo.GetById(Style.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Style.ClothCategoryId);
-                PatternList.Add(GetDetails(Style, gender, category));
-            }
+            List<GetStyleDto> StyleList = new List<GetStyleDto>();
+            foreach (var Style in Styles) StyleList.Add(GetDetails(Style));
             return new StylesResponseModel()
             {
-                Data = PatternList,
+                Data = StyleList,
                 Message = "Style Retrieved Successfully",
                 Status = true
             };
@@ -152,16 +142,11 @@ public class StyleService : IStyleService
         var Styles = await _repository.GetByStylePrice(price);
         if (Styles != null)
         {
-            List<GetStyleDto> PatternList = new List<GetStyleDto>();
-            foreach (var Style in Styles)
-            {
-                var gender = await _clothGenderRepo.GetById(Style.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Style.ClothCategoryId);
-                PatternList.Add(GetDetails(Style, gender, category));
-            }
+            List<GetStyleDto> StyleList = new List<GetStyleDto>();
+            foreach (var Style in Styles) StyleList.Add(GetDetails(Style));
             return new StylesResponseModel()
             {
-                Data = PatternList,
+                Data = StyleList,
                 Message = "Styles List Retrieved Successfully",
                 Status = true
             };
@@ -179,12 +164,7 @@ public class StyleService : IStyleService
         if (Styles != null)
         {
             List<GetStyleDto> StyleList = new List<GetStyleDto>();
-            foreach (var Style in Styles)
-            {
-                var gender = await _clothGenderRepo.GetById(Style.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Style.ClothCategoryId);
-                StyleList.Add(GetDetails(Style, gender, category));
-            }
+            foreach (var Style in Styles) StyleList.Add(GetDetails(Style));
             return new StylesResponseModel()
             {
                 Data = StyleList,
@@ -205,12 +185,7 @@ public class StyleService : IStyleService
         if (Styles != null)
         {
             List<GetStyleDto> StyleList = new List<GetStyleDto>();
-            foreach (var Style in Styles)
-            {
-                var gender = await _clothGenderRepo.GetById(Style.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Style.ClothCategoryId);
-                StyleList.Add(GetDetails(Style, gender, category));
-            }
+            foreach (var Style in Styles) StyleList.Add(GetDetails(Style));
             return new StylesResponseModel()
             {
                 Data = StyleList,
@@ -231,12 +206,7 @@ public class StyleService : IStyleService
         if (Patterns != null)
         {
             List<GetStyleDto> PatternList = new List<GetStyleDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns)       PatternList.Add(GetDetails(Pattern));
             return new StylesResponseModel()
             {
                 Data = PatternList,
@@ -251,7 +221,7 @@ public class StyleService : IStyleService
             Status = false
         };
     }
-    public GetStyleDto GetDetails(Style style, ClothGender gender, ClothCategory category)
+    public GetStyleDto GetDetails(Style style)
     {
 
         return new GetStyleDto
@@ -262,13 +232,13 @@ public class StyleService : IStyleService
             StylePrice = style.StylePrice,
             GetClothCategoryDto = new GetClothCategoryDto()
             {
-                Id = category.Id,
-                ClothName = category.ClothName,
+                Id = style.ClothCategories.Id,
+                ClothName = style.ClothCategories.ClothName,
             },
             GetClothGenderDto = new GetClothGenderDto()
             {
-                Id = gender.Id,
-                Gender = gender.Gender,
+                Id = style.ClothGender.Id,
+                Gender = style.ClothGender.Gender,
             }
         };
     }

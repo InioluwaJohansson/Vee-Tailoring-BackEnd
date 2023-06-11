@@ -291,6 +291,10 @@ namespace Vee_Tailoring.Migrations
                     b.Property<int>("ClothGenderId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CollectionDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("CollectionId")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -1049,9 +1053,6 @@ namespace Vee_Tailoring.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("DefaultPriceId")
-                        .HasColumnType("int");
-
                     b.Property<int>("DeletedBy")
                         .HasColumnType("int");
 
@@ -1091,10 +1092,6 @@ namespace Vee_Tailoring.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("OrderId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("ShoulderWidth")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -1112,8 +1109,6 @@ namespace Vee_Tailoring.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DefaultPriceId");
 
                     b.ToTable("OrderMeasurements");
                 });
@@ -1625,7 +1620,7 @@ namespace Vee_Tailoring.Migrations
                         .IsRequired();
 
                     b.HasOne("Vee_Tailoring.Entities.Post", "Post")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1665,7 +1660,7 @@ namespace Vee_Tailoring.Migrations
             modelBuilder.Entity("Vee_Tailoring.Entities.Identity.UserRole", b =>
                 {
                     b.HasOne("Vee_Tailoring.Entities.Identity.Role", "Role")
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1770,17 +1765,6 @@ namespace Vee_Tailoring.Migrations
                     b.Navigation("Staff");
 
                     b.Navigation("Style");
-                });
-
-            modelBuilder.Entity("Vee_Tailoring.Entities.OrderMeasurement", b =>
-                {
-                    b.HasOne("Vee_Tailoring.Entities.DefaultPrice", "DefaultPrice")
-                        .WithMany()
-                        .HasForeignKey("DefaultPriceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DefaultPrice");
                 });
 
             modelBuilder.Entity("Vee_Tailoring.Entities.Pattern", b =>
@@ -1962,11 +1946,6 @@ namespace Vee_Tailoring.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Vee_Tailoring.Entities.Identity.Role", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
             modelBuilder.Entity("Vee_Tailoring.Entities.Identity.User", b =>
                 {
                     b.Navigation("Customer")
@@ -1976,11 +1955,6 @@ namespace Vee_Tailoring.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("Vee_Tailoring.Entities.Post", b =>
-                {
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

@@ -6,6 +6,7 @@ public class CreateCollectionDto
 {
     public string CollectionId { get; set; }
     public string CollectionName { get; set; }
+    public string CollectionDescription { get; set; }
     public int ClothGenderId { get; set; }
     public int ClothCategoryId { get; set; }
     public IFormFile ImageUrl { get; set; }
@@ -15,6 +16,7 @@ public class GetCollectionDto
     public int Id { get; set; }
     public string CollectionId { get; set; }
     public string CollectionName { get; set; }
+    public string CollectionDescription { get; set; }
     public string ClothGender { get; set; }
     public string ClothCategory { get; set; }
     public ICollection<GetTemplateDto> TemplateDto { get; set; } = new HashSet<GetTemplateDto>();
@@ -24,6 +26,7 @@ public class GetCollectionDto
 public class UpdateCollectionDto
 {
     public string CollectionName { get; set; }
+    public string CollectionDescription { get; set; }
     public int ClothGenderId { get; set; }
     public int ClothCategoryId { get; set; }
     public IFormFile ImageUrl { get; set; }

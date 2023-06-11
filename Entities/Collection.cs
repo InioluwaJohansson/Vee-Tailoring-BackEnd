@@ -7,6 +7,7 @@ public class Collection : AuditableEntity
 {
     public string CollectionId { get; set; }
     public string CollectionName { get; set; }
+    public string CollectionDescription { get; set; }
     public ClothGender ClothGender { get; set; }
     public int ClothGenderId { get; set; }
     public ClothCategory ClothCategory { get; set; }

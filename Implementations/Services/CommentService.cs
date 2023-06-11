@@ -9,11 +9,9 @@ namespace Vee_Tailoring.Implementations.Services;
 public class CommentService : ICommentService
 {
     ICommentRepo _repository;
-    ICustomerRepo _customerRepo;
-    public CommentService(ICommentRepo repository, ICustomerRepo customerRepo)
+    public CommentService(ICommentRepo repository)
     {
         _repository = repository;
-        _customerRepo = customerRepo;
     }
     public async Task<BaseResponse> Create(CreateCommentDto createCommentDto)
     {
@@ -53,12 +51,11 @@ public class CommentService : ICommentService
     public async Task<CommentResponseModel> GetById(int id)
     {
         var comment = await _repository.GetById(id);
-        var customer = await _customerRepo.GetById(comment.CustomerId);
         if (comment != null)
         {
             return new CommentResponseModel()
             {
-                Data = GetDetails(comment, customer),
+                Data = GetDetails(comment),
                 Message = "Comment Retrieved Successfully",
                 Status = true
             };
@@ -70,14 +67,14 @@ public class CommentService : ICommentService
             Status = true
         };
     }
-    public GetCommentDto GetDetails(Comment comment, Customer customer)
+    public GetCommentDto GetDetails(Comment comment)
     {
         return new GetCommentDto()
         {
             Id = comment.Id,
             PostId = comment.PostId,
-            CustomerName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
-            CustomerImageUrl = customer.UserDetails.ImageUrl,
+            CustomerName = $"{comment.Customer.UserDetails.LastName} {comment.Customer.UserDetails.FirstName}",
+            CustomerImageUrl = comment.Customer.UserDetails.ImageUrl,
             Comment = comment.Comments,
             Likes = comment.Likes,
             CommentDate = comment.CommentDate

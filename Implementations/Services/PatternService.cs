@@ -8,13 +8,9 @@ namespace Vee_Tailoring.Implementations.Services;
 public class PatternService : IPatternService
 {
     IPatternRepo _repository;
-    IClothGenderRepo _clothGenderRepo;
-    IClothCategoryRepo _clothCategoryRepo;
-    public PatternService(IPatternRepo repository, IClothGenderRepo clothGenderRepo, IClothCategoryRepo clothCategoryRepo)
+    public PatternService(IPatternRepo repository)
     {
         _repository = repository;
-        _clothGenderRepo = clothGenderRepo;
-        _clothCategoryRepo = clothCategoryRepo;
     }
     public async Task<BaseResponse> Create(CreatePatternDto createPatternDto)
     {
@@ -105,11 +101,9 @@ public class PatternService : IPatternService
         var Pattern = await _repository.GetById(id);
         if (Pattern != null)
         {
-            var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-            var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
             return new PatternResponseModel()
             {
-                Data = GetDetails(Pattern, gender, category),
+                Data = GetDetails(Pattern),
                 Message = "Pattern Retrieved Successfully",
                 Status = true
             };
@@ -127,12 +121,7 @@ public class PatternService : IPatternService
         if (Patterns != null)
         {
             List<GetPatternDto> PatternList = new List<GetPatternDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns) PatternList.Add(GetDetails(Pattern));
             return new PatternsResponseModel()
             {
                 Data = PatternList,
@@ -153,12 +142,7 @@ public class PatternService : IPatternService
         if (Patterns != null)
         {
             List<GetPatternDto> PatternList = new List<GetPatternDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns) PatternList.Add(GetDetails(Pattern));
             return new PatternsResponseModel()
             {
                 Data = PatternList,
@@ -179,12 +163,7 @@ public class PatternService : IPatternService
         if (Patterns != null)
         {
             List<GetPatternDto> PatternList = new List<GetPatternDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns) PatternList.Add(GetDetails(Pattern));
             return new PatternsResponseModel()
             {
                 Data = PatternList,
@@ -205,12 +184,7 @@ public class PatternService : IPatternService
         if (Patterns != null)
         {
             List<GetPatternDto> PatternList = new List<GetPatternDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns) PatternList.Add(GetDetails(Pattern));
             return new PatternsResponseModel()
             {
                 Data = PatternList,
@@ -231,12 +205,7 @@ public class PatternService : IPatternService
         if (Patterns != null)
         {
             List<GetPatternDto> PatternList = new List<GetPatternDto>();
-            foreach (var Pattern in Patterns)
-            {
-                var gender = await _clothGenderRepo.GetById(Pattern.ClothGenderId);
-                var category = await _clothCategoryRepo.GetById(Pattern.ClothCategoryId);
-                PatternList.Add(GetDetails(Pattern, gender, category));
-            }
+            foreach (var Pattern in Patterns)       PatternList.Add(GetDetails(Pattern));
             return new PatternsResponseModel()
             {
                 Data = PatternList,
@@ -251,7 +220,7 @@ public class PatternService : IPatternService
             Status = false
         };
     }
-    public GetPatternDto GetDetails(Pattern pattern, ClothGender gender, ClothCategory category)
+    public GetPatternDto GetDetails(Pattern pattern)
     {
         
         return new GetPatternDto
@@ -261,13 +230,13 @@ public class PatternService : IPatternService
             PatternPrice = pattern.PatternPrice,
             GetClothCategoryDto = new GetClothCategoryDto()
             {
-                Id = category.Id,
-                ClothName = category.ClothName,
+                Id = pattern.ClothCategories.Id,
+                ClothName = pattern.ClothCategories.ClothName,
             },
             GetClothGenderDto = new GetClothGenderDto()
             {
-                Id = gender.Id,
-                Gender = gender.Gender,
+                Id = pattern.ClothGender.Id,
+                Gender = pattern.ClothGender.Gender,
             }
         };
     }
