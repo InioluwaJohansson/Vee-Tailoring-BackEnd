@@ -9,16 +9,12 @@ public class PostService : IPostService
 {
     IPostRepo _repository;
     ICommentRepo _commentrepository;
-    ICustomerRepo _customerrepository;
-    IStaffRepo _staffrepository;
-    ICategoryRepo _categoryrepository;
-    public PostService(IPostRepo repository, ICommentRepo commentrepository, ICustomerRepo customerrepository, IStaffRepo staffrepository, ICategoryRepo categoryrepository)
+    IUserRepo _userRepository;
+    public PostService(IPostRepo repository, ICommentRepo commentrepository, IUserRepo userRepository)
     {
         _repository = repository;
         _commentrepository = commentrepository;
-        _customerrepository = customerrepository;
-        _staffrepository = staffrepository;
-        _categoryrepository = categoryrepository;
+        _userRepository = userRepository;
     }
     public async Task<BaseResponse> Create(CreatePostDto createPostDto)
     {
@@ -121,23 +117,51 @@ public class PostService : IPostService
             Status = false
         };
     }
+    public async Task<BaseResponse> ApproveDisApprovePost(int id, int UserId)
+    {
+        var post = await _repository.GetById(id);
+        var user = await _userRepository.Get(x => x.Id == UserId);
+        if (post != null && user != null)
+        {
+            foreach (var role in user.UserRoles)
+            {
+                if (role.Role.Name == "Administrator")
+                {
+                    if (post.IsApproved == false)
+                    {
+                        post.IsApproved = true;
+                        post.PublishDate = DateTime.Now;
+                    }
+                    else
+                    {
+                        post.IsApproved = false;
+                    }
+                    await _repository.Update(post);
+                }
+            }
+            return new BaseResponse()
+            {
+                Message = "Post Updated Successfully",
+                Status = true
+            };
+        }
+        return new BaseResponse()
+        {
+            Message = "Unable To Update Post Successfully",
+            Status = false
+        };
+    }
     public async Task<PostResponseModel> GetById(int id)
     {
         var post = await _repository.GetById(id);
         var comments = await _commentrepository.GetByPostId(post.Id);
-        var category = await _categoryrepository.GetById(post.CategoryId);
         List<GetCommentDto> CommentList = new List<GetCommentDto>();
-        foreach (var comment in comments)
-        {
-            var customer = await _customerrepository.GetById(comment.CustomerId); 
-            CommentList.Add(GetCommentDetails(comment, customer));
-        }
-        var staff = await _staffrepository.GetById(post.StaffId);
+        foreach (var comment in comments)       CommentList.Add(GetCommentDetails(comment));
         if(post != null)
         {
             return new PostResponseModel()
             {
-                Data = GetDetails(post, category, CommentList, staff),
+                Data = GetDetails(post, CommentList),
                 Message = "Post Retrieved Successfully",
                 Status = true
             };
@@ -158,15 +182,9 @@ public class PostService : IPostService
             foreach (var post in posts)
             {
                 var comments = await _commentrepository.GetByPostId(post.Id);
-                var category = await _categoryrepository.GetById(post.CategoryId);
                 List<GetCommentDto> CommentList = new List<GetCommentDto>();
-                foreach (var comment in comments)
-                {
-                    var customer = await _customerrepository.GetById(comment.CustomerId);
-                    CommentList.Add(GetCommentDetails(comment, customer));
-                }
-                var staff = await _staffrepository.GetById(post.StaffId);
-                PostList.Add(GetDetails(post, category, CommentList, staff));
+                foreach (var comment in comments)CommentList.Add(GetCommentDetails(comment));
+                PostList.Add(GetDetails(post, CommentList));
             }
             return new PostsResponseModel()
             {
@@ -191,15 +209,9 @@ public class PostService : IPostService
             foreach (var post in posts)
             {
                 var comments = await _commentrepository.GetByPostId(post.Id);
-                var category = await _categoryrepository.GetById(post.CategoryId);
                 List<GetCommentDto> CommentList = new List<GetCommentDto>();
-                foreach (var comment in comments)
-                {
-                    var customer = await _customerrepository.GetById(comment.CustomerId);
-                    CommentList.Add(GetCommentDetails(comment, customer));
-                }
-                var staff = await _staffrepository.GetById(post.StaffId);
-                PostList.Add(GetDetails(post, category, CommentList, staff));
+                foreach (var comment in comments)       CommentList.Add(GetCommentDetails(comment));
+                PostList.Add(GetDetails(post, CommentList));
              }
             return new PostsResponseModel()
             {
@@ -224,15 +236,9 @@ public class PostService : IPostService
             foreach (var post in posts)
             {
                 var comments = await _commentrepository.GetByPostId(post.Id);
-                var category = await _categoryrepository.GetById(post.CategoryId);
                 List<GetCommentDto> CommentList = new List<GetCommentDto>();
-                foreach (var comment in comments)
-                {
-                    var customer = await _customerrepository.GetById(comment.CustomerId);
-                    CommentList.Add(GetCommentDetails(comment, customer));
-                }
-                var staff = await _staffrepository.GetById(post.StaffId);
-                PostList.Add(GetDetails(post, category, CommentList, staff));
+                foreach (var comment in comments)       CommentList.Add(GetCommentDetails(comment));
+                PostList.Add(GetDetails(post, CommentList));
             }
             return new PostsResponseModel()
             {
@@ -248,29 +254,29 @@ public class PostService : IPostService
             Status = false
         };
     }
-    public GetCommentDto GetCommentDetails(Comment comment, Customer customer)
+    public GetCommentDto GetCommentDetails(Comment comment)
     {
         return new GetCommentDto()
         {
             Id = comment.Id,
             PostId = comment.PostId,
-            CustomerName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
-            CustomerImageUrl = customer.UserDetails.ImageUrl,
+            CustomerName = $"{comment.Customer.UserDetails.LastName} {comment.Customer.UserDetails.FirstName}",
+            CustomerImageUrl = comment.Customer.UserDetails.ImageUrl,
             Comment = comment.Comments,
             Likes = comment.Likes,
             CommentDate = comment.CommentDate
         };
     }
-    public GetPostDto GetDetails(Post post, Category category, List<GetCommentDto> comments, Staff staff)
+    public GetPostDto GetDetails(Post post, List<GetCommentDto> comments)
     {
         return new GetPostDto()
         {
             Id = post.Id,
             GetCategoryDto = new GetCategoryDto()
             {
-                Id = category.Id,
-                CategoryName = category.CategoryName,
-                CategoryDescription =  category.CategoryDescription,
+                Id = post.Category.Id,
+                CategoryName = post.Category.CategoryName,
+                CategoryDescription =  post.Category.CategoryDescription,
             },
             PostTitle = post.PostTitle,
             PostImage = post.PostImage,
@@ -278,8 +284,8 @@ public class PostService : IPostService
             PublishDate = post.PublishDate,
             ReadTime = post.ReadTime,
             Likes = post.Likes,
-            StaffName = $"{staff.UserDetails.LastName} {staff.UserDetails.FirstName}",
-            StaffImage = staff.UserDetails.ImageUrl,
+            StaffName = $"{post.Staff.UserDetails.LastName} {post.Staff.UserDetails.FirstName}",
+            StaffImage = post.Staff.UserDetails.ImageUrl,
             GetCommentDtos = comments,
         };
     }

@@ -68,8 +68,11 @@ public class UserService : IUserService
                 $"<a href={passwordLink} >Click Here<a>" + 
                 "/n This link expires in 3 minutes. /n/n Vee Tailoring Management",
             };
-            //var response = await _emailSend.SendEmail(sendEmail);
             var tokenStatus = await GeneratePasswordResetToken(user.Id);
+            if(tokenStatus.Status)
+            {
+                //var response = await _emailSend.SendEmail(sendEmail);
+            }
             return new BaseResponse()
             {
                 Message = $"A Password Reset Link Has Been Sent To {email}, {passwordLink}",
@@ -125,13 +128,13 @@ public class UserService : IUserService
         {
             return new BaseResponse()
             {
-                Message = "Token Generated Successfully!",
+                Message = "Token Verified Successfully!",
                 Status = true
             };
         }
         return new BaseResponse()
         {
-            Message = "Unable To Generate Token!",
+            Message = "Unable To Verify Token Successfully!",
             Status = false
         };
     }

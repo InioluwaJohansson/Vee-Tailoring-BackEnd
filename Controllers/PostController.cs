@@ -51,6 +51,18 @@ public class PostController : ControllerBase
         return BadRequest(post);
     }
 
+    // GET : ApproveDisApprovePost
+    [HttpPut("ApproveDisApprovePost")]
+    public async Task<IActionResult> ApproveDisApprovePost(int id, int UserId)
+    {
+        var post = await _postService.ApproveDisApprovePost(id, UserId);
+        if (post.Status == true)
+        {
+            return Ok(post);
+        }
+        return BadRequest(post);
+    }
+
     // GET : GetPostById
     [HttpGet("GetPostById")]
     public async Task<IActionResult> GetById(int id)

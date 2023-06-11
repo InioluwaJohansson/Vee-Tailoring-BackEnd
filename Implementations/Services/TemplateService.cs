@@ -10,23 +10,9 @@ namespace Vee_Tailoring.Implementations.Services;
 public class TemplateService : ITemplateService
 {
     ITemplateRepo _repository;
-    IStyleRepo _stylerepository;
-    IPatternRepo _patternrepository;
-    IMaterialRepo _materialrepository;
-    IColorRepo _colorrepository;
-    IArmTypeRepo _armTyperepository;
-    IClothGenderRepo _clothGenderrepository;
-    IClothCategoryRepo _clothCategoryrepository;
-    public TemplateService(ITemplateRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo)
+    public TemplateService(ITemplateRepo repository)
     {
         _repository = repository;
-        _stylerepository = styleRepo;
-        _patternrepository = patternRepo;
-        _materialrepository = materialRepo;
-        _colorrepository = colorRepo;
-        _armTyperepository = armTypeRepo;
-        _clothCategoryrepository = clothCategoryRepo;
-        _clothGenderrepository = clothGenderRepo;
     }
     public async Task<BaseResponse> Create(CreateTemplateDto createTemplateDto)
     {
@@ -82,16 +68,9 @@ public class TemplateService : ITemplateService
         var template = await _repository.GetById(id);
         if(template != null)
         {
-            var style = await _stylerepository.GetById(template.StyleId);
-            var pattern = await _patternrepository.GetById(template.PatternId);
-            var armType = await _armTyperepository.GetById(template.ArmTypeId);
-            var color = await _colorrepository.GetById(template.ColorId);
-            var material = await _materialrepository.GetById(template.MaterialId);
-            var clothCategory = await _clothCategoryrepository.GetById(template.ClothCategoryId);
-            var clothGender = await _clothGenderrepository.GetById(template.ClothGenderId);
             return new TemplateResponseModel()
             {
-                Data = GetDetails(template, style, pattern, material, color, armType, clothCategory, clothGender),
+                Data = GetDetails(template),
                 Message = "Template Retrieved Successfully",
                 Status = true
             };
@@ -109,17 +88,7 @@ public class TemplateService : ITemplateService
         if (templates != null)
         {
             List<GetTemplateDto> TemplateList = new List<GetTemplateDto>();
-            foreach (var template in templates)
-            {
-                var style = await _stylerepository.GetById(template.StyleId);
-                var pattern = await _patternrepository.GetById(template.PatternId);
-                var armType = await _armTyperepository.GetById(template.ArmTypeId);
-                var color = await _colorrepository.GetById(template.ColorId);
-                var material = await _materialrepository.GetById(template.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(template.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(template.ClothGenderId);
-                TemplateList.Add(GetDetails(template, style, pattern, material, color, armType, clothCategory, clothGender));
-            }
+            foreach (var template in templates)     TemplateList.Add(GetDetails(template));
             return new TemplatesResponseModel()
             {
                 Data = TemplateList,
@@ -140,17 +109,7 @@ public class TemplateService : ITemplateService
         if (templates != null)
         {
             List<GetTemplateDto> TemplateList = new List<GetTemplateDto>();
-            foreach (var template in templates)
-            {
-                var style = await _stylerepository.GetById(template.StyleId);
-                var pattern = await _patternrepository.GetById(template.PatternId);
-                var armType = await _armTyperepository.GetById(template.ArmTypeId);
-                var color = await _colorrepository.GetById(template.ColorId);
-                var material = await _materialrepository.GetById(template.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(template.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(template.ClothGenderId);
-                TemplateList.Add(GetDetails(template, style, pattern, material, color, armType, clothCategory, clothGender));
-            }
+            foreach (var template in templates)     TemplateList.Add(GetDetails(template));
             return new TemplatesResponseModel()
             {
                 Data = TemplateList,
@@ -171,17 +130,7 @@ public class TemplateService : ITemplateService
         if (templates != null)
         {
             List<GetTemplateDto> TemplateList = new List<GetTemplateDto>();
-            foreach (var template in templates)
-            {
-                var style = await _stylerepository.GetById(template.StyleId);
-                var pattern = await _patternrepository.GetById(template.PatternId);
-                var armType = await _armTyperepository.GetById(template.ArmTypeId);
-                var color = await _colorrepository.GetById(template.ColorId);
-                var material = await _materialrepository.GetById(template.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(template.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(template.ClothGenderId);
-                TemplateList.Add(GetDetails(template, style, pattern, material, color, armType, clothCategory, clothGender));
-            }
+            foreach (var template in templates)     TemplateList.Add(GetDetails(template));
             return new TemplatesResponseModel()
             {
                 Data = TemplateList,
@@ -202,17 +151,7 @@ public class TemplateService : ITemplateService
         if(templates != null)
         {
             List<GetTemplateDto> TemplateList = new List<GetTemplateDto>();
-            foreach (var template in templates)
-            {
-                var style = await _stylerepository.GetById(template.StyleId);
-                var pattern = await _patternrepository.GetById(template.PatternId);
-                var armType = await _armTyperepository.GetById(template.ArmTypeId);
-                var color = await _colorrepository.GetById(template.ColorId);
-                var material = await _materialrepository.GetById(template.MaterialId);
-                var clothCategory = await _clothCategoryrepository.GetById(template.ClothCategoryId);
-                var clothGender = await _clothGenderrepository.GetById(template.ClothGenderId);
-                TemplateList.Add(GetDetails(template, style, pattern, material, color, armType, clothCategory, clothGender));
-            }
+            foreach (var template in templates)     TemplateList.Add(GetDetails(template));
             return new TemplatesResponseModel()
             {
                 Data = TemplateList,
@@ -227,7 +166,7 @@ public class TemplateService : ITemplateService
             Status = false
         };
     }
-    public GetTemplateDto GetDetails(Template template, Style style, Pattern pattern, Material material, Color color, ArmType armType, ClothCategory clothCategory, ClothGender clothGender)
+    public GetTemplateDto GetDetails(Template template)
     {
         return new GetTemplateDto()
         {
@@ -237,62 +176,62 @@ public class TemplateService : ITemplateService
             GetCollectionDto = new GetCollectionDto()
             {
                 CollectionName = template.Collection.CollectionName,
-                ClothGender = clothGender.Gender,
-                ClothCategory = clothCategory.ClothName
+                ClothGender = template.ClothGender.Gender,
+                ClothCategory = template.ClothCategory.ClothName
             },
             GetStyleDto = new GetStyleDto()
             {
-                StyleId = style.StyleId,
-                StyleName = style.StyleName,
-                StyleUrl = style.StyleUrl,
-                StylePrice = style.StylePrice,
+                StyleId = template.Style.StyleId,
+                StyleName = template.Style.StyleName,
+                StyleUrl = template.Style.StyleUrl,
+                StylePrice = template.Style.StylePrice,
                 GetClothCategoryDto = new GetClothCategoryDto()
                 {
-                    Id = clothCategory.Id,
-                    ClothName = clothCategory.ClothName
+                    Id = template.ClothCategory.Id,
+                    ClothName = template.ClothCategory.ClothName
                 },
                 GetClothGenderDto = new GetClothGenderDto()
                 {
-                    Id = clothGender.Id,
-                    Gender = clothGender.Gender,
+                    Id = template.ClothGender.Id,
+                    Gender = template.ClothGender.Gender,
                 }
             },
             GetPatternDto = new GetPatternDto()
             {
-                Id = pattern.Id,
-                PatternName = pattern.PatternName,
-                PatternUrl = pattern.PatternUrl,
-                PatternPrice = pattern.PatternPrice,
+                Id = template.Pattern.Id,
+                PatternName = template.Pattern.PatternName,
+                PatternUrl = template.Pattern.PatternUrl,
+                PatternPrice = template.Pattern.PatternPrice,
                 GetClothCategoryDto = new GetClothCategoryDto()
                 {
-                    Id = clothCategory.Id,
-                    ClothName = clothCategory.ClothName
+                    Id = template.ClothCategory.Id,
+                    ClothName = template.ClothCategory.ClothName
                 },
                 GetClothGenderDto = new GetClothGenderDto()
                 {
-                    Id = clothGender.Id,
-                    Gender = clothGender.Gender,
+                    Id = template.ClothGender.Id,
+                    Gender = template.ClothGender.Gender,
                 }
             },
             GetMaterialDto = new GetMaterialDto()
             {
-                Id = material.Id,
-                MaterialName = material.MaterialName,
-                MaterialUrl = material.MaterialUrl,
-                MaterialPrice = material.MaterialPrice,
+                Id = template.Material.Id,
+                MaterialName = template.Material.MaterialName,
+                MaterialUrl = template.Material.MaterialUrl,
+                MaterialPrice = template.Material.MaterialPrice,
             },
             GetColorDto = new GetColorDto()
             {
-                Id = color.Id,
-                ColorName = color.ColorName,
-                ColorCode = color.ColorCode,
+                Id = template.Color.Id,
+                ColorName = template.Color.ColorName,
+                ColorCode = template.Color.ColorCode,
             },
             GetArmTypeDto = new GetArmTypeDto()
             {
-                Id = armType.Id,
-                ArmLength = armType.ArmLength
+                Id = template.ArmType.Id,
+                ArmLength = template.ArmType.ArmLength
             },
-            Price = style.StylePrice + pattern.PatternPrice + material.MaterialPrice,
+            Price = template.Style.StylePrice + template.Pattern.PatternPrice + template.Material.MaterialPrice,
         };
     }
     public async Task<DashBoardResponse> TemplatesDashboard()

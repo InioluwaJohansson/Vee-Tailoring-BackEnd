@@ -6,6 +6,7 @@ public interface IPostService
     Task<BaseResponse> Create(CreatePostDto createPostDto);
     Task<BaseResponse> Update(int id, UpdatePostDto updatePostDto);
     Task<BaseResponse> UpdateLikes(int id);
+    Task<BaseResponse> ApproveDisApprovePost(int id, int UserId);
     Task<PostResponseModel> GetById(int id);
     Task<PostsResponseModel> GetByPostTitle(string postTitle);
     Task<PostsResponseModel> GetByCategoryId(int categoryId);

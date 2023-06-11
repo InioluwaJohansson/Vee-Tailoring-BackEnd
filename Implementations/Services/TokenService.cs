@@ -31,28 +31,26 @@ public class TokenService : ITokenService
                 await _repository.Update(getToken);
             }
             var generateToken = Guid.NewGuid().ToString().Substring(0, 10);
-            while (BCrypt.Net.BCrypt.Verify(generateToken, (await _repository.Get(x => x.TokenNo == generateToken)).TokenNo) == true)
-            {
-                generateToken = Guid.NewGuid().ToString().Substring(0, 10);
-            }
+            var tokenNo = await CheckTokenStatus(generateToken, tokenType);
             var token = new Token()
             {
-                TokenNo = BCrypt.Net.BCrypt.HashPassword(generateToken),
+                TokenNo = BCrypt.Net.BCrypt.HashPassword(tokenNo),
                 TokenType = tokenType,
                 TokenStartTime = DateTime.Now,
                 TokenEndTime = DateTime.Now.AddMinutes(3.0),
+                UserId = id,
             };
             await _repository.Create(token);
-            var email = new CreateEmailDto()
+            var sendEmail = new CreateEmailDto()
             {
-                Subject = "Payment Token",
-                ReceiverName = $"{user.Customer.UserDetails.LastName} {user.Customer.UserDetails.FirstName}",
+                Subject = $"V Tailoring: {tokenType.ToString()} Token",
+                ReceiverName = $"{user.UserName}",
                 ReceiverEmail = user.Email,
-                Message = $"Payment Token Generated! /n" +
-                $"Use the token below to initiate your recent payment. /n" +
-                $"{generateToken} /n" + "This token expires in 3 minutes. /n" + "Vee Tailoring"
+                Message = $"{tokenType.ToString()} Token Generated! /n" +
+                $"Use the token below to initiate your recent {tokenType.ToString()}. /n" +
+                $"Token: {generateToken} /n" + "This token expires in 3 minutes. /n" + "Vee Tailoring"
             };
-            await _email.SendEmail(email);
+            await _email.SendEmail(sendEmail);
             return true;
         }
         return false;
@@ -67,5 +65,38 @@ public class TokenService : ITokenService
             return true;
         }
         return false;
+    }
+    public async Task<string> CheckTokenStatus(string TokenNo, TokenType tokenType)
+    {
+        var tokens = await _repository.GetByExpression(x => x.IsDeleted == false && x.TokenType ==tokenType);
+        var status = false;
+        if(tokens != null)
+        {
+            foreach(var token in tokens)
+            {
+                var check =  BCrypt.Net.BCrypt.Verify(TokenNo, token.TokenNo);
+                if (check && token.TokenType == tokenType)
+                {
+                    status = true;
+                    break;
+                }
+            }
+            if (status)
+            {
+                var generateToken = Guid.NewGuid().ToString().Substring(0, 10);
+                await CheckTokenStatus(generateToken, tokenType);
+                
+            }
+            else
+            {
+                return TokenNo;
+            }
+        }
+        else if(tokens == null)
+        {   
+            return TokenNo;
+        }
+        
+        return null;
     }
 }

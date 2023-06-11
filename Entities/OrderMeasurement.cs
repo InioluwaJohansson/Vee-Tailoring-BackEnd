@@ -3,8 +3,6 @@ namespace Vee_Tailoring.Entities;
 
 public class OrderMeasurement : AuditableEntity
 {
-    public DefaultPrice DefaultPrice { get; set; }
-    public string OrderId { get; set; } = "0.00";
     public string Head { get; set; } = "0.00";
     public string NeckSize { get; set; } = "0.00";
     public string ShoulderWidth { get; set; } = "0.00";
