@@ -14,12 +14,11 @@ public class RoleRepo : BaseRepository<Role>, IRoleRepo
     }
     public async Task<IList<Role>> GetRoleByUserId(int Id)
     {
-        var role = await context.UserRoles.Include(c => c.User).Include(c => c.Role).Where(c => c.Id == Id).Select(r => new Role()
+        return await context.UserRoles.Include(c => c.User).Include(c => c.Role).Where(c => c.UserId == Id).Select(r => new Role()
         {
             Name = r.Role.Name,
             Description = r.Role.Description,
         }).ToListAsync();
-        return role;
     }
     public async Task<IList<Role>> GetAllRoles()
     {

@@ -36,7 +36,7 @@ public class StaffService : IStaffService
                 Password = BCrypt.Net.BCrypt.HashPassword(createStaffDto.Password),
             };
             var user = await _userrepository.Create(newUser);
-            var role = await _rolerepository.Get(c => c.Name == createStaffDto.Role);
+            var role = await _rolerepository.Get(c => c.Id == createStaffDto.RoleId);
             if (role == null)
             {
                 return new BaseResponse()
@@ -87,7 +87,7 @@ public class StaffService : IStaffService
                 ReceiverEmail = createStaffDto.Email,
                 Message = $"Hi {createStaffDto.FirstName}, /n" +
                 $"Thanks for joing us. We hope you gain valueable experience with us to help you acheve your full potential. /n" +
-                $"You've been assigned as {createStaffDto.Role}. /n" +
+                $"You've been assigned as a {role.Name}. /n" +
                 $"Signed: Vee Management" +
                 $"Login to finish setting up your profile."
             };
@@ -165,7 +165,7 @@ public class StaffService : IStaffService
         {
             return new StaffResponseModel()
             {
-                Data = GetDetails(staff),
+                Data = await GetDetails(staff),
                 Message = "Staff Retrieved Successfully",
                 Status = true,
             };
@@ -184,7 +184,7 @@ public class StaffService : IStaffService
         {
             return new StaffResponseModel()
             {
-                Data = GetDetails(staff),
+                Data = await GetDetails(staff),
                 Message = "Staff Retrieved Successfully",
                 Status = true,
             };
@@ -203,7 +203,7 @@ public class StaffService : IStaffService
         {
             return new StaffsResponseModel()
             {
-                Data = staffs.Select(staff => GetDetails(staff)).ToList(),
+                Data = (IList<GetStaffDto>)staffs.Select(async staff => (await GetDetails(staff))).ToList(),
                 Message = "Staff Retrieved Successfully",
                 Status = true,
             };
@@ -217,12 +217,12 @@ public class StaffService : IStaffService
     }
     public async Task<StaffsResponseModel> GetAllStaffs()
     {
-        var staffs = await _repository.GetAll();
+        var staffs = await _repository.List();
         if (staffs != null)
         {
             return new StaffsResponseModel()
             {
-                Data = staffs.Select(staff => GetDetails(staff)).ToList(),
+                Data = (IList<GetStaffDto>)staffs.Select(async staff => (await GetDetails(staff))).ToList(),
                 Message = "Staffs List Retrieved Successfully",
                 Status = true,
             };
@@ -234,8 +234,9 @@ public class StaffService : IStaffService
             Status = false,
         };
     }
-    public GetStaffDto GetDetails(Staff staff)
+    public async Task<GetStaffDto> GetDetails(Staff staff)
     {
+        var roles = await _rolerepository.GetRoleByUserId(staff.User.Id);
         return new GetStaffDto()
         {
             Id = staff.Id,
@@ -258,7 +259,13 @@ public class StaffService : IStaffService
                     Country = staff.UserDetails.Address.Country,
                 }
             },
-            
+            GetRoleDto = roles.Select(
+                role => new GetRoleDto()
+                {
+                    Id = role.Id,
+                    Name = role.Name,
+                    Description = role.Description,
+            }).ToList(),
         };
     }
     public async Task<DashBoardResponse> StaffsDashboard()

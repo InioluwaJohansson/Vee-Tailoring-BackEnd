@@ -12,6 +12,9 @@
   <ItemGroup>
     <PackageReference Include="Aspose.Words" Version="23.4.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Mastercard.Developer.ClientEncryption.RestSharpV2" Version="1.6.0" />
+    <PackageReference Include="Mastercard.Developer.OAuth1Signer.Core" Version="1.4.0" />
+    <PackageReference Include="Mastercard.Developer.OAuth1Signer.RestSharpV2" Version="1.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.4" />
