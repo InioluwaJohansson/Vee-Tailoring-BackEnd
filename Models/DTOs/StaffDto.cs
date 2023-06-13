@@ -10,7 +10,7 @@ public class CreateStaffDto
     public Gender Gender { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
-    public string Role { get; set; }
+    public int RoleId { get; set; }
 }
 public class GetStaffDto
 {
@@ -18,6 +18,7 @@ public class GetStaffDto
     public GetUserDetailsDto GetUserDetailsDto { get; set; }
     public string StaffNo { get; set; }
     public string Email { get; set; }
+    public ICollection<GetRoleDto> GetRoleDto { get; set; } = new HashSet<GetRoleDto>();
 }
 public class UpdateStaffDto
 {

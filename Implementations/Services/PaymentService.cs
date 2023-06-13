@@ -7,6 +7,9 @@ using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
 using Vee_Tailoring.Emails;
+using Vee_Tailoring.Payments;
+using Mastercard.Developer.OAuth1Signer.Core.Utils;
+using Mastercard.Developer.OAuth1Signer.Core;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -93,9 +96,6 @@ public class PaymentService : IPaymentService
 
                             // Configure the API credentials
                             /*
-                            Configuration.SetApiKey(_configuration["MasterCard:ApiKey"]);
-                            Configuration.SetApiSecret(_configuration["MasterCard:ApiSecret"]);
-                            Configuration.SetSandbox(_configuration["MasterCard:NotLive"]); // Use true for sandbox/testing, false for production
 
                             // Create a new checkout session
                             var checkoutSession = CheckoutApi.CreateSession(merchantId, new SessionRequest
@@ -115,13 +115,25 @@ public class PaymentService : IPaymentService
 
                             // Access the session ID
                             var sessionId = checkoutSession.Session.Id;
+
+                            
                             */
+                            var signingKey = AuthenticationUtils.LoadSigningKey($"{_configuration["Mastercard:PCKS#12_Path"]}", $"{_configuration["Mastercard:Key_Alias"]}", $"{_configuration["Mastercard:Key_Password"]}");
+                            var consumerKey = $"{_configuration["MasterCard:ClientId"]}";
+                            var uri = "https://sandbox.api.mastercard.com/service";
+                            var method = "POST";
+                            var payload = "Hello world!";
+                            var encoding = Encoding.UTF8;
+                            var authHeader = OAuth.GetAuthorizationHeader(uri, method, payload, encoding, consumerKey, signingKey);
+                            var baseUri = new Uri("https://api.mastercard.com/");
+                            var httpClient = new HttpClient(new RequestSignerHandler(consumerKey, signingKey)) { BaseAddress = baseUri };
+                            var postTask = httpClient.PostAsync(new Uri("/service", UriKind.Relative), new StringContent("{\"foo\":\"bår\"}"));
+
                             var content = new StringContent(JsonSerializer.Serialize(new
                             {
                                 currency = "USD",
                                 pin = card.CardPin,
                                 validFrom = card.ValidTHRU,
-                                untilEnd = card,
                                 cvv = card.CVV,
                                 amount = cart.Data.TotalPrice,
                                 email = customer.User.Email,
