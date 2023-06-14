@@ -201,10 +201,12 @@ public class StaffService : IStaffService
         var staffs = await _repository.GetbyEmail(Email);
         if (staffs != null)
         {
+            List<GetStaffDto> StaffList = new List<GetStaffDto>();
+            foreach (var staff in staffs) StaffList.Add(await GetDetails(staff));
             return new StaffsResponseModel()
             {
-                Data = (IList<GetStaffDto>)staffs.Select(async staff => (await GetDetails(staff))).ToList(),
-                Message = "Staff Retrieved Successfully",
+                Data = StaffList,
+                Message = "Staffs List Retrieved Successfully",
                 Status = true,
             };
         }
@@ -220,9 +222,11 @@ public class StaffService : IStaffService
         var staffs = await _repository.List();
         if (staffs != null)
         {
+            List<GetStaffDto> StaffList = new List<GetStaffDto>();
+            foreach(var staff in staffs) StaffList.Add( await  GetDetails(staff));
             return new StaffsResponseModel()
             {
-                Data = (IList<GetStaffDto>)staffs.Select(async staff => (await GetDetails(staff))).ToList(),
+                Data = StaffList,
                 Message = "Staffs List Retrieved Successfully",
                 Status = true,
             };

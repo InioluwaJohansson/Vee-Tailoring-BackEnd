@@ -13,26 +13,26 @@ public class TemplateRepo : BaseRepository<Template>, ITemplateRepo
     }
     public async Task<Template> GetById(int id)
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).SingleOrDefaultAsync(c => c.Id == id);
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).SingleOrDefaultAsync(c => c.Id == id && c.IsDeleted == false);
     }
     public async Task<IList<Template>> GetAllTemplatesByClothCategory(int clothCategory)
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.ClothCategoryId == clothCategory).ToListAsync();
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.ClothCategoryId == clothCategory && c.IsDeleted == false).ToListAsync();
     }
     public async Task<IList<Template>> GetAllTemplatesByClothCategoryClothGender(int clothCategory, int clothGender)
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.ClothCategoryId == clothCategory && c.ClothGenderId == clothGender &&  c.ClothGenderId == 3).ToListAsync();
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.ClothCategoryId == clothCategory && c.ClothGenderId == clothGender && c.IsDeleted == false).ToListAsync();
     }
     public async Task<IList<Template>> GetAllTemplatesByCollectionId(int id)
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.CollectionId == id).ToListAsync();
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.CollectionId == id && c.IsDeleted == false).ToListAsync();
     }
     public async Task<IList<Template>> GetAllTemplates()
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).ToListAsync();
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.IsDeleted == false).ToListAsync();
     }
     public async Task<IList<Template>> GetByTemplateName(string TemplateName)
     {
-        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.TemplateName.StartsWith(TemplateName)).ToListAsync();
+        return await context.Templates.Include(c => c.ArmType).Include(c => c.Color).Include(c => c.Material).Include(c => c.Pattern).Include(c => c.Style).Where(c => c.TemplateName.StartsWith(TemplateName) && c.IsDeleted == false).ToListAsync();
     }
 }
