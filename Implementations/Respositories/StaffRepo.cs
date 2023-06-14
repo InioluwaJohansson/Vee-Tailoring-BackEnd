@@ -21,7 +21,7 @@ public class StaffRepo : BaseRepository<Staff>, IStaffRepo
     }
     public async Task<IList<Staff>> GetbyEmail(string email)
     {
-        return await context.Staffs.Include(c => c.User).Include(c => c.UserDetails).Include(c => c.UserDetails.Address).Where(c => c.User.Email == email && c.IsDeleted == false).ToListAsync();
+        return await context.Staffs.Include(c => c.User).Include(c => c.UserDetails).Include(c => c.UserDetails.Address).Where(c => c.User.Email.StartsWith(email) && c.IsDeleted == false).ToListAsync();
     }
     public async Task<IList<Staff>> List()
     {

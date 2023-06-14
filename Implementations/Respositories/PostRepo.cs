@@ -13,7 +13,7 @@ public class PostRepo : BaseRepository<Post>, IPostRepo
     }
     public async Task<Post> GetById(int Id)
     {
-        return await context.Posts.Include(c => c.Category).SingleOrDefaultAsync(c => c.Id == Id && c.IsDeleted == false);
+        return await context.Posts.Include(c => c.Category).Include(c => c.Staff).SingleOrDefaultAsync(c => c.Id == Id && c.IsDeleted == false);
     }
     public async Task<IList<Post>> GetByTitle(string postTitle)
     {
