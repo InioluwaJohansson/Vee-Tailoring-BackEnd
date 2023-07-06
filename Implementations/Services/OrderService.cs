@@ -11,26 +11,12 @@ namespace Vee_Tailoring.Implementations.Services;
 public class OrderService : IOrderService
 {
     IOrderRepo _repository;
-    IStyleRepo _stylerepository;
-    IPatternRepo _patternrepository;
-    IMaterialRepo _materialrepository;
-    IColorRepo _colorrepository;
-    IArmTypeRepo _armTyperepository;
-    IClothGenderRepo _clothGenderrepository;
-    IClothCategoryRepo _clothCategoryrepository;
     IDefaultPriceRepo _defaultPricerepository;
     IStaffRepo _staffrepository;
     ICustomerRepo _customerrepository;
-    public OrderService(IOrderRepo repository, IStyleRepo styleRepo, IPatternRepo patternRepo, IMaterialRepo materialRepo, IColorRepo colorRepo, IArmTypeRepo armTypeRepo, IClothCategoryRepo clothCategoryRepo, IClothGenderRepo clothGenderRepo, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
+    public OrderService(IOrderRepo repository, IDefaultPriceRepo defaultPricerepository, IStaffRepo staffrepository, ICustomerRepo customerrepository)
     {
         _repository = repository;
-        _stylerepository = styleRepo;
-        _patternrepository = patternRepo;
-        _materialrepository = materialRepo;
-        _colorrepository = colorRepo;
-        _armTyperepository = armTypeRepo;
-        _clothCategoryrepository = clothCategoryRepo;
-        _clothGenderrepository = clothGenderRepo;
         _defaultPricerepository = defaultPricerepository;
         _staffrepository = staffrepository;
         _customerrepository = customerrepository;
@@ -111,7 +97,22 @@ public class OrderService : IOrderService
             order.OrderAddress.Region = updateOrderDto.UpdateOrderAddressDto.Region ?? order.OrderAddress.Region;
             order.OrderAddress.State = updateOrderDto.UpdateOrderAddressDto.State ?? order.OrderAddress.State;
             order.OrderAddress.Country = updateOrderDto.UpdateOrderAddressDto.Country ?? order.OrderAddress.Country;
-
+            order.OrderMeasurements.AnkleSize = $"{updateOrderDto.UpdateOrderMeasurementDto.AnkleSize}" ?? order.OrderMeasurements.AnkleSize;
+            order.OrderMeasurements.ArmLength = $"{updateOrderDto.UpdateOrderMeasurementDto.ArmLength}" ?? order.OrderMeasurements.ArmLength;
+            order.OrderMeasurements.ArmSize = $"{updateOrderDto.UpdateOrderMeasurementDto.ArmSize}" ?? order.OrderMeasurements.ArmSize;
+            order.OrderMeasurements.BackWaist = $"{updateOrderDto.UpdateOrderMeasurementDto.BackWaist}" ?? order.OrderMeasurements.BackWaist;
+            order.OrderMeasurements.BodyHeight = $"{updateOrderDto.UpdateOrderMeasurementDto.BodyHeight}" ?? order.OrderMeasurements.BodyHeight;
+            order.OrderMeasurements.BurstGirth = $"{updateOrderDto.UpdateOrderMeasurementDto.BurstGirth}" ?? order.OrderMeasurements.BurstGirth;
+            order.OrderMeasurements.FrontWaist = $"{updateOrderDto.UpdateOrderMeasurementDto.FrontWaist}" ?? order.OrderMeasurements.FrontWaist;
+            order.OrderMeasurements.Head = $"{updateOrderDto.UpdateOrderMeasurementDto.Head}" ?? order.OrderMeasurements.Head;
+            order.OrderMeasurements.HighHips = $"{updateOrderDto.UpdateOrderMeasurementDto.HighHips}" ?? order.OrderMeasurements.HighHips;
+            order.OrderMeasurements.HipSize = $"{updateOrderDto.UpdateOrderMeasurementDto.HipSize}" ?? order.OrderMeasurements.HipSize;
+            order.OrderMeasurements.LegLength = $"{updateOrderDto.UpdateOrderMeasurementDto.LegLength}" ?? order.OrderMeasurements.LegLength;
+            order.OrderMeasurements.NeckSize = $"{updateOrderDto.UpdateOrderMeasurementDto.NeckSize}" ?? order.OrderMeasurements.NeckSize;
+            order.OrderMeasurements.ShoulderWidth = $"{updateOrderDto.UpdateOrderMeasurementDto.ShoulderWidth}" ?? order.OrderMeasurements.ShoulderWidth;
+            order.OrderMeasurements.ThirdQuarterLegLength = $"{updateOrderDto.UpdateOrderMeasurementDto.ThirdQuarterLegLength}" ?? order.OrderMeasurements.ThirdQuarterLegLength;
+            order.OrderMeasurements.WaistSize = $"{updateOrderDto.UpdateOrderMeasurementDto.WaistSize}" ?? order.OrderMeasurements.WaistSize;
+            order.OrderMeasurements.WristCircumfrence = $"{updateOrderDto.UpdateOrderMeasurementDto.WristCircumfrence}" ?? order.OrderMeasurements.WristCircumfrence;
             await _repository.Update(order);
             return new BaseResponse()
             {
@@ -557,22 +558,22 @@ public class OrderService : IOrderService
         }
         else
         {
-            decimal measurementPrice = (Decimal.Parse(order.Customer.Measurements.AnkleSize) + 
-                Decimal.Parse(order.Customer.Measurements.ArmLength) +
-                Decimal.Parse(order.Customer.Measurements.ArmSize) +
-                Decimal.Parse(order.Customer.Measurements.BackWaist) + 
-                Decimal.Parse(order.Customer.Measurements.BodyHeight) + 
-                Decimal.Parse(order.Customer.Measurements.BurstGirth) + 
-                Decimal.Parse(order.Customer.Measurements.FrontWaist) + 
-                Decimal.Parse(order.Customer.Measurements.Head) + 
-                Decimal.Parse(order.Customer.Measurements.HighHips) + 
-                Decimal.Parse(order.Customer.Measurements.HipSize) + 
-                Decimal.Parse(order.Customer.Measurements.LegLength) + 
-                Decimal.Parse(order.Customer.Measurements.NeckSize) + 
-                Decimal.Parse(order.Customer.Measurements.ShoulderWidth) + 
-                Decimal.Parse(order.Customer.Measurements.ThirdQuarterLegLength) + 
-                Decimal.Parse(order.Customer.Measurements.WaistSize) + 
-                Decimal.Parse(order.Customer.Measurements.WristCircumfrence)
+            decimal measurementPrice = (Decimal.Parse(order.OrderMeasurements.AnkleSize) + 
+                Decimal.Parse(order.OrderMeasurements.ArmLength) +
+                Decimal.Parse(order.OrderMeasurements.ArmSize) +
+                Decimal.Parse(order.OrderMeasurements.BackWaist) + 
+                Decimal.Parse(order.OrderMeasurements.BodyHeight) + 
+                Decimal.Parse(order.OrderMeasurements.BurstGirth) + 
+                Decimal.Parse(order.OrderMeasurements.FrontWaist) + 
+                Decimal.Parse(order.OrderMeasurements.Head) + 
+                Decimal.Parse(order.OrderMeasurements.HighHips) + 
+                Decimal.Parse(order.OrderMeasurements.HipSize) + 
+                Decimal.Parse(order.OrderMeasurements.LegLength) + 
+                Decimal.Parse(order.OrderMeasurements.NeckSize) + 
+                Decimal.Parse(order.OrderMeasurements.ShoulderWidth) + 
+                Decimal.Parse(order.OrderMeasurements.ThirdQuarterLegLength) + 
+                Decimal.Parse(order.OrderMeasurements.WaistSize) + 
+                Decimal.Parse(order.OrderMeasurements.WristCircumfrence)
                 ) * defaultPrice.Price;
             price = (measurementPrice + order.Style.StylePrice + order.Pattern.PatternPrice + order.Material.MaterialPrice) * order.Pieces;
         }
@@ -660,6 +661,7 @@ public class OrderService : IOrderService
                 Region = order.OrderAddress.Region,
                 State = order.OrderAddress.State,
                 Country = order.OrderAddress.Country,
+                PostalCode = order.OrderAddress.PostalCode,
             },
             GetOrderMeasurementDto = new GetOrderMeasurementDto()
             {
@@ -743,6 +745,7 @@ public class OrderService : IOrderService
                         Region = order.Staff.UserDetails.Address.Region,
                         State = order.Staff.UserDetails.Address.State,
                         Country = order.Staff.UserDetails.Address.Country,
+                        PostalCode = order.Staff.UserDetails.Address.PostalCode,
                     }
                 }
             }

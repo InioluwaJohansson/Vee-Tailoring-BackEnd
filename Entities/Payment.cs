@@ -10,6 +10,7 @@ public class Payment : AuditableEntity
     public int CustomerId { get; set; }
     public Customer Customer { get; set; }
     public Order Order { get; set; }
+    public string PaymentRoute { get; set; }
     public decimal AmountPaid { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal StoreTaxes { get; set; }

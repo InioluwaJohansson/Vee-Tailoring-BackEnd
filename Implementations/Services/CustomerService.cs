@@ -286,6 +286,7 @@ public class CustomerService : ICustomerService
                     Region = customer.UserDetails.Address.Region,
                     State = customer.UserDetails.Address.State,
                     Country = customer.UserDetails.Address.Country,
+                    PostalCode = customer.UserDetails.Address.PostalCode,
                 }
             },
             GetMeasurementDto = new GetMeasurementDto()

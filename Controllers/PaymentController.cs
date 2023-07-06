@@ -94,6 +94,18 @@ public class PaymentController : ControllerBase
         }
         return BadRequest(payment);
     }
+
+    // GET : GetAllpaymentsByDateRange
+    [HttpGet("GetAllPayments")]
+    public async Task<IActionResult> GetAllPaymentsGetAllPaymentsDateRange(DateTime startDate, DateTime endDate)
+    {
+        var payment = await _paymentService.GetAllPaymentsDateRange(startDate, endDate);
+        if (payment.Status == true)
+        {
+            return Ok(payment);
+        }
+        return BadRequest(payment);
+    }
     // GET : GetpaymentById
     [HttpGet("GenerateInvoice")]
     public async Task<IActionResult> GenerateInvoice(int id)

@@ -22,7 +22,8 @@ public class CardService : ICardService
             {
                 UserId = createCardDto.UserId,
                 CardPin = createCardDto.CardPin,
-                ValidTHRU = createCardDto.ValidTHRU,
+                expiryMonth = createCardDto.ExpiryMonth,
+                expiryYear = createCardDto.ExpiryYear,
                 CVV = createCardDto.CVV,
                 IsDeleted = false
             };

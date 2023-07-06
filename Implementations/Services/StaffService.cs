@@ -86,7 +86,7 @@ public class StaffService : IStaffService
                 ReceiverName = $"{createStaffDto.LastName} {createStaffDto.FirstName}",
                 ReceiverEmail = createStaffDto.Email,
                 Message = $"Hi {createStaffDto.FirstName}, /n" +
-                $"Thanks for joing us. We hope you gain valueable experience with us to help you acheve your full potential. /n" +
+                $"Thanks for joining us. We hope you gain valueable experience with us as you aim to acheve your full potential. /n" +
                 $"You've been assigned as a {role.Name}. /n" +
                 $"Signed: Vee Management" +
                 $"Login to finish setting up your profile."

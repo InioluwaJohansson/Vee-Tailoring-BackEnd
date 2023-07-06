@@ -68,11 +68,7 @@ public class UserService : IUserService
                 $"<a href={passwordLink} >Click Here<a>" + 
                 "/n This link expires in 3 minutes. /n/n Vee Tailoring Management",
             };
-            var tokenStatus = await GeneratePasswordResetToken(user.Id);
-            if(tokenStatus.Status)
-            {
-                var response = await _emailSend.SendEmail(sendEmail);
-            }
+            await _emailSend.SendEmail(sendEmail);
             return new BaseResponse()
             {
                 Message = $"A Password Reset Link Has Been Sent To {email}, {passwordLink}",

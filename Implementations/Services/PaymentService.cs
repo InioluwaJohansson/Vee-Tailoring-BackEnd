@@ -1,15 +1,11 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using Vee_Tailoring.Entities;
+﻿using Vee_Tailoring.Entities;
 using Vee_Tailoring.Interfaces.Services;
 using Vee_Tailoring.Interfaces.Respositories;
 using Vee_Tailoring.Models.DTOs;
 using Vee_Tailoring.Models.Enums;
 using Vee_Tailoring.Emails;
 using Vee_Tailoring.Payments;
-using Mastercard.Developer.OAuth1Signer.Core.Utils;
-using Mastercard.Developer.OAuth1Signer.Core;
+using System.Net;
 
 namespace Vee_Tailoring.Implementations.Services;
 
@@ -23,8 +19,8 @@ public class PaymentService : IPaymentService
     ITokenService _tokenService;
     IDefaultPriceRepo _defaultPriceRepo;
     ICardRepo _cardRepo;
-    IConfiguration _configuration;
-    public PaymentService(IPaymentRepo repository, IOrderService orderService, ICustomerRepo customerRepo, IOrderRepo orderRepo, ITokenService tokenService, IDefaultPriceRepo defaultPriceRepo, IEmailSend email, ICardRepo cardRepo, IConfiguration configuration)
+    IPaymentsHandler _paymentsHandler;
+    public PaymentService(IPaymentRepo repository, IOrderService orderService, ICustomerRepo customerRepo, IOrderRepo orderRepo, ITokenService tokenService, IDefaultPriceRepo defaultPriceRepo, IEmailSend email, ICardRepo cardRepo, IPaymentsHandler paymentsHandler)
     {
         _repository = repository;
         _orderService = orderService;
@@ -34,7 +30,7 @@ public class PaymentService : IPaymentService
         _tokenService = tokenService;
         _defaultPriceRepo = defaultPriceRepo;
         _cardRepo = cardRepo;
-        _configuration = configuration;
+        _paymentsHandler = paymentsHandler;
     }
     public async Task<BaseResponse> GenerateToken(int id)
     {
@@ -62,90 +58,32 @@ public class PaymentService : IPaymentService
             if (token == true)
             {
                 var cart = await _orderService.GetCartOrdersByCustomerId(id);
-                if (cart != null && customer != null)
+                if (cart != null)
                 {
                     var generateRef = Guid.NewGuid().ToString().Substring(0, 15);
-                    var client = new HttpClient();
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage catchresponse = new HttpResponseMessage();
+                    HttpStatusCode response = new HttpStatusCode();
                     if (makePayment.paymentMethod == PaymentMethod.Paystack)
                     {
-                        var url = "https://api.paystack.co/transaction/initialize";
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["EmailSettings:SendInBlueKey"]);
-                        var content = new StringContent(JsonSerializer.Serialize(new
+                        var package = new PayStackPackage()
                         {
                             currency = "USD",
                             amount = cart.Data.TotalPrice,
                             email = customer.User.Email,
                             referenceNumber = generateRef
 
-                        }), Encoding.UTF8, "application/json");
-                        catchresponse = await client.PostAsync(url, content);
-                        var reString = await catchresponse.Content.ReadAsStringAsync();
-                        var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
+                        };
+                        response = await _paymentsHandler.PaystackPayment(package);
                     }
-                    if (makePayment.paymentMethod == PaymentMethod.MasterCard)
+                    if (makePayment.paymentMethod == PaymentMethod.Visa)
                     {
                         var card = await _cardRepo.Get(x => x.Id == makePayment.CardId && x.UserId == id && x.IsDeleted == false);
                         if(card != null)
                         {
-                            var url = "https://api.paystack.co/transaction/initialize";
-                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayPal:SecretKey"]);
-                            // Set up your API credentials
-
-                            // Configure the API credentials
-                            /*
-
-                            // Create a new checkout session
-                            var checkoutSession = CheckoutApi.CreateSession(merchantId, new SessionRequest
-                            {
-                                ApiOperation = "CREATE_CHECKOUT_SESSION",
-                                Order = new Order
-                                {
-                                    Amount = 1000,
-                                    Currency = "USD",
-                                    Reference = "YourOrderReference"
-                                },
-                                Interaction = new Interaction
-                                {
-                                    ReturnUrl = "https://your-website.com/checkout/complete"
-                                }
-                            });
-
-                            // Access the session ID
-                            var sessionId = checkoutSession.Session.Id;
-
-                            
-                            */
-                            var signingKey = AuthenticationUtils.LoadSigningKey($"{_configuration["Mastercard:PCKS#12_Path"]}", $"{_configuration["Mastercard:Key_Alias"]}", $"{_configuration["Mastercard:Key_Password"]}");
-                            var consumerKey = $"{_configuration["MasterCard:ClientId"]}";
-                            var uri = "https://sandbox.api.mastercard.com/service";
-                            var method = "POST";
-                            var payload = "Hello world!";
-                            var encoding = Encoding.UTF8;
-                            var authHeader = OAuth.GetAuthorizationHeader(uri, method, payload, encoding, consumerKey, signingKey);
-                            var baseUri = new Uri("https://api.mastercard.com/");
-                            var httpClient = new HttpClient(new RequestSignerHandler(consumerKey, signingKey)) { BaseAddress = baseUri };
-                            var postTask = httpClient.PostAsync(new Uri("/service", UriKind.Relative), new StringContent("{\"foo\":\"bår\"}"));
-
-                            var content = new StringContent(JsonSerializer.Serialize(new
-                            {
-                                currency = "USD",
-                                pin = card.CardPin,
-                                validFrom = card.ValidTHRU,
-                                cvv = card.CVV,
-                                amount = cart.Data.TotalPrice,
-                                email = customer.User.Email,
-                                referenceNumber = generateRef
-                            }), Encoding.UTF8, "application/json");
-                            catchresponse = await client.PostAsync(url, content);
-                            var reString = await catchresponse.Content.ReadAsStringAsync();
-                            var responseObj = JsonSerializer.Deserialize<PaymentMethodsDto>(reString);
+                            response = await _paymentsHandler.VisaPayment(card, cart.Data.TotalPrice);
                         }
                         
                     }
-                    if (catchresponse.StatusCode == System.Net.HttpStatusCode.OK)
+                    if (response == System.Net.HttpStatusCode.OK)
                     {
                         var updateOrderPayment = new UpdateOrderPaymentCheck()
                         {
@@ -160,6 +98,7 @@ public class PaymentService : IPaymentService
                             StoreTaxes = (await _defaultPriceRepo.GetStoreTaxes()).Price,
                             CustomerId = customer.Id,
                             ReferenceNumber = generateRef,
+                            PaymentRoute = makePayment.paymentMethod.ToString(),
                             DateOfPayment = DateTime.UtcNow,
                             IsDeleted = false,
                         };
@@ -174,7 +113,7 @@ public class PaymentService : IPaymentService
                                 Subject = "Order(s) Completed Successfully",
                                 ReceiverName = $"{customer.UserDetails.LastName} {customer.UserDetails.FirstName}",
                                 ReceiverEmail = customer.User.Email,
-                                Message = $"Hi Thanks for shopping with us. /n" +
+                                Message = $"Hi, {customer.UserDetails.LastName} {customer.UserDetails.FirstName} Thanks for shopping with us. /n" +
                                 $"Check your order history to keep track of your Orders. /n" +
                                 $"{GetOrderNos(order)} /n" + "Vee Tailoring"
                             };
@@ -204,14 +143,19 @@ public class PaymentService : IPaymentService
                 }
                 return new BaseResponse()
                 {
-                    Message = "Incorrect Password!",
+                    Message = "Sorry. Your Cart Is Empty!",
                     Status = false
                 };
             }
+            return new BaseResponse()
+            {
+                Message = "Token Expired. Kindly Generate A New Payment Token!",
+                Status = false
+            };
         }
         return new BaseResponse()
         {
-            Message = "Incorrect Password!",
+            Message = "Session Expired",
             Status = false
         };
     }
@@ -411,6 +355,7 @@ public class PaymentService : IPaymentService
             var InvoiceOutput = new GetInvoiceDto()
             {
                 ReferenceNo = getinvoice.ReferenceNumber,
+                PaymentRoute = getinvoice.PaymentRoute,
                 AmountPaid = getinvoice.AmountPaid,
                 ShippingFee = getinvoice.ShippingFee,
                 StoreTaxes = getinvoice.StoreTaxes,
@@ -473,6 +418,7 @@ public class PaymentService : IPaymentService
         return new GetPaymentDto
         {
             Id = payment.Id,
+            PaymentRoute = payment.PaymentRoute,
             AmountPaid = payment.AmountPaid,
             ShippingFee = payment.ShippingFee,
             StoreTaxes = payment.StoreTaxes,

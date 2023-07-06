@@ -2,6 +2,6 @@
 
 public enum PaymentMethod
 {
-    MasterCard = 1,
+    Visa = 1,
     Paystack = 2,
 }

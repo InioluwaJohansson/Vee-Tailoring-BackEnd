@@ -5,7 +5,8 @@ public class CreateCardDto
 {
     public string CardPin { get; set; }
     public int UserId { get; set; }
-    public string ValidTHRU { get; set; }
+    public int ExpiryMonth { get; set; }
+    public int ExpiryYear { get; set; }
     public string CVV { get; set; }
 }
 public class GetCardDto

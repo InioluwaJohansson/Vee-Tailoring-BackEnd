@@ -15,11 +15,9 @@ public class Order: AuditableEntity
     public Customer Customer { get; set; }
     public int CustomerId { get; set; }
     public OrderAddress OrderAddress { get; set; }
-    public int OrderAddressId { get; set; }
     public Style Style { get; set; }
     public int StyleId { get; set; }
     public OrderMeasurement OrderMeasurements { get; set; }
-    public int OrderMeasurementId { get; set; }
     public Pattern Pattern { get; set; }
     public int PatternId { get; set; }
     public Color Color { get; set; }
