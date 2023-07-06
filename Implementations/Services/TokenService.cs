@@ -30,7 +30,7 @@ public class TokenService : ITokenService
                 getToken.IsDeleted = true;
                 await _repository.Update(getToken);
             }
-            var generateToken = Guid.NewGuid().ToString().Substring(0, 10);
+            var generateToken = Guid.NewGuid().GetHashCode().ToString().Substring(0, 6);
             var tokenNo = await CheckTokenStatus(generateToken, tokenType);
             var token = new Token()
             {
@@ -83,7 +83,7 @@ public class TokenService : ITokenService
             }
             if (status)
             {
-                var generateToken = Guid.NewGuid().ToString().Substring(0, 10);
+                var generateToken = Guid.NewGuid().GetHashCode().ToString().Substring(0, 6);
                 await CheckTokenStatus(generateToken, tokenType);
                 
             }

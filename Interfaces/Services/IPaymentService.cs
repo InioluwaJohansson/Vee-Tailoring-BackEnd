@@ -12,5 +12,6 @@ public interface IPaymentService
     Task<PaymentResponse> GetPayment(int id);
     Task<PaymentsResponseModel> GetAllPaymentsByCustomer(int id);
     Task<PaymentsResponseModel> GetAllPayments();
+    Task<PaymentsResponseModel> GetAllPaymentsDateRange(DateTime startDate, DateTime endDate);
     Task<InvoiceResponse> GenerateInvoice(int id);
 }

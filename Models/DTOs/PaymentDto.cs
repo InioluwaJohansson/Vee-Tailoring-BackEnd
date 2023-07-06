@@ -13,6 +13,7 @@ public class GetPaymentDto
 {
     public int Id { get; set; }
     public string ReferenceNo { get; set; }
+    public string PaymentRoute { get; set; }
     public decimal AmountPaid { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal StoreTaxes { get; set; }
@@ -29,6 +30,7 @@ public class UpdateOrderPaymentCheck
 public class GetInvoiceDto
 {
     public string ReferenceNo { get; set; }
+    public string PaymentRoute { get; set; }
     public decimal AmountPaid { get; set; }
     public decimal ShippingFee { get; set; }
     public decimal StoreTaxes { get; set; }
