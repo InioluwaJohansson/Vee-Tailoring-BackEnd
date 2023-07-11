@@ -7,6 +7,8 @@ using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
+using Vee_Tailoring.Models.DTOs;
+
 namespace Vee_Tailoring.Emails;
 
 public class EmailSender : IEmailSend
@@ -38,25 +40,25 @@ public class EmailSender : IEmailSend
         SendSmtpEmailCc CcData = new SendSmtpEmailCc(CcEmail, CcName);
         List<SendSmtpEmailCc> Cc = new List<SendSmtpEmailCc>();
         Cc.Add(CcData);
-        string HtmlContent = $"<html><body><div style='background-color: coral; color: black;'><h1>{email.Message}</h1></div></body></html>";
+        string HtmlContent = email.Message;
         string TextContent = null;
         string Subject = email.Subject;
-        string ReplyToName = "V Tailoring";
+        string ReplyToName = "Vee Tailoring";
         string ReplyToEmail = "inioluwa.makinde10@gmail.com";
         SendSmtpEmailReplyTo ReplyTo = new SendSmtpEmailReplyTo(ReplyToEmail, ReplyToName);
-        string AttachmentUrl = null;
+        string AttachmentUrl = email.AttachmentUrl;
         string stringInBase64 = "aGVsbG8gdGhpcyBpcyB0ZXN0";
         byte[] Content = System.Convert.FromBase64String(stringInBase64);
-        string AttachmentName = "test.txt";
+        string AttachmentName = email.Attachment.FileName;
         SendSmtpEmailAttachment AttachmentContent = new SendSmtpEmailAttachment(AttachmentUrl, Content, AttachmentName);
         List<SendSmtpEmailAttachment> Attachment = new List<SendSmtpEmailAttachment>();
         Attachment.Add(AttachmentContent);
         JObject Headers = new JObject();
-        Headers.Add("V Tailoring", "unique-id-1234");
+        Headers.Add("Vee Tailoring", "unique-id-1234");
         long? TemplateId = null;
         JObject Params = new JObject();
         Params.Add("parameter", "My param value");
-        Params.Add("subject", "New Subject");
+        Params.Add("subject", email.Subject);
         List<string> Tags = new List<string>();
         Tags.Add("mytag");
         SendSmtpEmailTo1 smtpEmailTo1 = new SendSmtpEmailTo1(ToEmail, ToName);
@@ -73,16 +75,5 @@ public class EmailSender : IEmailSend
         apiInstance.SendTransacEmail(sendSmtpEmail);
         Configuration.Default.ApiKey.Clear();
         return true;
-    }
-    public async Task<bool> SendEmail(CreateEmailDto email)
-    {
-        if(email != null)
-        {
-            return await SendMail(email);
-        }
-        else
-        {
-            return false;
-        }
     }
 } 

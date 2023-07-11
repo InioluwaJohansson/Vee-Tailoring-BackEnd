@@ -50,7 +50,7 @@ public class TokenService : ITokenService
                 $"Use the token below to initiate your recent {tokenType.ToString()}. /n" +
                 $"Token: {generateToken} /n" + "This token expires in 3 minutes. /n" + "Vee Tailoring"
             };
-            await _email.SendEmail(sendEmail);
+            await _email.SendMail(sendEmail);
             return true;
         }
         return false;
@@ -85,7 +85,6 @@ public class TokenService : ITokenService
             {
                 var generateToken = Guid.NewGuid().GetHashCode().ToString().Substring(0, 6);
                 await CheckTokenStatus(generateToken, tokenType);
-                
             }
             else
             {
@@ -96,7 +95,6 @@ public class TokenService : ITokenService
         {   
             return TokenNo;
         }
-        
         return null;
     }
 }

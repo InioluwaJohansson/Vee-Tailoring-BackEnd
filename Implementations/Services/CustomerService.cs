@@ -107,7 +107,7 @@ public class CustomerService : ICustomerService
                 $"Thanks for registering an account with us. /n" +
                 $"Login to finish setting up your profile."
             };
-            var response = await _emailSend.SendEmail(email);
+            var response = await _emailSend.SendMail(email);
             return new BaseResponse()
             {
                 Message = "Account Created Successfully",

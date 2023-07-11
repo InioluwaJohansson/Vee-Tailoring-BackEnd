@@ -117,7 +117,7 @@ public class PaymentService : IPaymentService
                                 $"Check your order history to keep track of your Orders. /n" +
                                 $"{GetOrderNos(order)} /n" + "Vee Tailoring"
                             };
-                            await _email.SendEmail(email);
+                            await _email.SendMail(email);
                             var adminEmail = new CreateEmailDto()
                             {
                                 Subject = "Order(s) Payment Completed Successfully",
@@ -127,7 +127,7 @@ public class PaymentService : IPaymentService
                                 $"You can use the following order numbers to keep track of the Orders /n" +
                                 $"{(GetOrderNos(order))} /n" + "Vee Tailoring"
                             };
-                            await _email.SendEmail(adminEmail);
+                            await _email.SendMail(adminEmail);
                             return new BaseResponse()
                             {
                                 Message = "Orders Payment Successful!",

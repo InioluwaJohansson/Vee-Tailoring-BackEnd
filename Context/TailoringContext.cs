@@ -38,5 +38,6 @@ public class TailoringContext: DbContext
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Complaint> Complaints { get; set; }
     public DbSet<Token> Token { get; set; }
+    public DbSet<Email> Email { get; set; }
     public DbSet<Card> Card { get; set; }
 }
