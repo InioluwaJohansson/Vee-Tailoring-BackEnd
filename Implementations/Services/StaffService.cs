@@ -91,7 +91,7 @@ public class StaffService : IStaffService
                 $"Signed: Vee Management" +
                 $"Login to finish setting up your profile."
             };
-            var response = await _emailSend.SendEmail(email);
+            var response = await _emailSend.SendMail(email);
             return new BaseResponse()
             {
                 Message = "Staff Registered Successfully",
