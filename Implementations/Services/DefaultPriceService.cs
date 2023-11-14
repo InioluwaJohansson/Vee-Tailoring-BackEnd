@@ -50,6 +50,29 @@ public class DefaultPriceService : IDefaultPriceService
             };
         }
     }
+    public async Task<BaseResponse> SetPrices(int id, int updateId)
+    {
+        var clothDefaultPrice = await _repository.GetById(id);
+        var clothDefaultPriceUpdate = await _repository.GetById(updateId);
+        if (clothDefaultPrice != null && clothDefaultPriceUpdate != null)
+        {
+            clothDefaultPrice.Price = clothDefaultPriceUpdate.Price;
+            await _repository.Update(clothDefaultPrice);
+            return new BaseResponse()
+            {
+                Message = "Default Price Updated Successfully",
+                Status = true
+            };
+        }
+        else
+        {
+            return new BaseResponse()
+            {
+                Message = "Unable To Set Default Price",
+                Status = false
+            };
+        }
+    }
     public async Task<DefaultPriceResponseModel> GetById(int id)
     {
         var clothDefaultPrice = await _repository.GetById(id);

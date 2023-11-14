@@ -13,12 +13,14 @@ public class UserService : IUserService
     IRoleRepo _roleRepo;
     IEmailSend _emailSend;
     ITokenService _tokenService;
-    public UserService(IUserRepo repository, IRoleRepo roleRepo, IEmailSend emailSend, ITokenService tokenService)
+    IConfiguration _configuration;
+    public UserService(IUserRepo repository, IRoleRepo roleRepo, IEmailSend emailSend, ITokenService tokenService, IConfiguration configuration)
     {
         _repository = repository;
         _roleRepo = roleRepo;
         _emailSend = emailSend;
         _tokenService = tokenService;
+        _configuration = configuration;
     }
     public async Task<UserLoginResponse> Login(string email, string password)
     {
@@ -61,12 +63,12 @@ public class UserService : IUserService
             string passwordLink = $"http://127.0.0.1:5500/Recovery/PasswordAuth.html?{token}{token2}?{resetDate}?{user.Id}?{token}{token2}";
             var sendEmail = new CreateEmailDto()
             {
-                Subject = "V Tailoring Account Password Recovery",
+                Subject = $"{_configuration["ApplicationDetails:AppName"]} Account Password Recovery",
                 ReceiverName = $"{user.UserName}",
                 ReceiverEmail = user.Email,
                 Message = $"Click the link below to reset your Password. /n" +
                 $"<a href={passwordLink} >Click Here<a>" + 
-                "/n This link expires in 3 minutes. /n/n Vee Tailoring Management",
+                $"/n This link expires in 3 minutes. /n {_configuration["ApplicationDetails:AppName"]} Management",
             };
             await _emailSend.SendMail(sendEmail);
             return new BaseResponse()

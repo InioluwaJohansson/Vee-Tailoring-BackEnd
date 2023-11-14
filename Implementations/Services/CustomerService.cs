@@ -123,7 +123,7 @@ public class CustomerService : ICustomerService
     public async Task<BaseResponse> Update(int id, UpdateCustomerDto updateCustomerDto)
     {
         var customer = await _repository.GetByUserId(id);
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Customer");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Customers\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

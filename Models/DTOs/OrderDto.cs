@@ -8,8 +8,9 @@ public class CreateOrderDto
     public int ClothCategory { get; set; }
     public OrderPerson OrderPerson { get; set; }
     public string OtherDetails { get; set; }
+    public IFormFile image { get; set; }
     public decimal Pieces { get; set; }
-    public OrderAddress OrderAddress { get; set; }
+    public CreateOrderAddressDto CreateOrderAddressDto { get; set; }
     public CreateOrderMeasurementDto CreateOrderMeasurementDto { get; set; }
     public int CustomerId { get; set; }
     public int StyleId { get; set; }
@@ -52,6 +53,7 @@ public class UpdateOrderDto
 {
     public int ClothGenderId { get; set; }
     public int ClothCategory { get; set; }
+    public IFormFile image { get; set; }
     public OrderPerson OrderPerson { get; set; }
     public decimal Pieces { get; set; }
     public UpdateOrderAddressDto UpdateOrderAddressDto { get; set; }

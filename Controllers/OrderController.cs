@@ -8,7 +8,7 @@ using Vee_Tailoring.Models.Enums;
 
 namespace Vee_Tailoring.Controllers;
 
-[Route("V_Tailoring/[controller]")]
+[Route("Vee_Tailoring/[controller]")]
 [ApiController]
 public class OrderController : Controller
 {

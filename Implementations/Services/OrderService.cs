@@ -23,6 +23,26 @@ public class OrderService : IOrderService
     }
     public async Task<BaseResponse> Create(CreateOrderDto createOrderDto)
     {
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Orders\\");
+        if (!System.IO.Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        var imagePath = "";
+        if (createOrderDto.image != null)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(createOrderDto.image.FileName);
+            var filePath = Path.Combine(folderPath, createOrderDto.image.FileName);
+            var extension = Path.GetExtension(createOrderDto.image.FileName);
+            if (!System.IO.Directory.Exists(filePath))
+            {
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await createOrderDto.image.CopyToAsync(stream);
+                }
+                imagePath = fileName;
+            }
+        }
         var order = new Order()
         {
             OrderId = $"ORDER{Guid.NewGuid().ToString().Replace("-", "").Substring(0, 15).ToUpper()}",
@@ -39,14 +59,16 @@ public class OrderService : IOrderService
             AddToCart = false,
             IsDeleted = false,
             LastModifiedOn = DateTime.UtcNow,
+            OtherDetails = createOrderDto.OtherDetails,
+            ImageUrl = imagePath,
             OrderAddress = new OrderAddress()
             {
-                PostalCode = createOrderDto.OrderAddress.PostalCode,
-                Street = createOrderDto.OrderAddress.Street,
-                City = createOrderDto.OrderAddress.City,
-                Region = createOrderDto.OrderAddress.Region,
-                State = createOrderDto.OrderAddress.State,
-                Country = createOrderDto.OrderAddress.Country,
+                PostalCode = createOrderDto.CreateOrderAddressDto.PostalCode,
+                Street = createOrderDto.CreateOrderAddressDto.Street,
+                City = createOrderDto.CreateOrderAddressDto.City,
+                Region = createOrderDto.CreateOrderAddressDto.Region,
+                State = createOrderDto.CreateOrderAddressDto.State,
+                Country = createOrderDto.CreateOrderAddressDto.Country,
                 IsDeleted = false,
             },
             OrderMeasurements = new OrderMeasurement()
@@ -80,7 +102,27 @@ public class OrderService : IOrderService
     public async Task<BaseResponse> Update(int id, UpdateOrderDto updateOrderDto)
     {
         var order = await _repository.GetOrderById(id);
-        if(order != null)
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Orders\\");
+        if (!System.IO.Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        var imagePath = "";
+        if (updateOrderDto.image != null)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(updateOrderDto.image.FileName);
+            var filePath = Path.Combine(folderPath, updateOrderDto.image.FileName);
+            var extension = Path.GetExtension(updateOrderDto.image.FileName);
+            if (!System.IO.Directory.Exists(filePath))
+            {
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await updateOrderDto.image.CopyToAsync(stream);
+                }
+                imagePath = fileName;
+            }
+        }
+        if (order != null)
         {
             order.ArmTypeId = updateOrderDto.ArmTypeId;
             order.ClothCategoryId = updateOrderDto.ClothCategory;
@@ -91,6 +133,7 @@ public class OrderService : IOrderService
             order.MaterialId = updateOrderDto.MaterialId;
             order.Pieces = updateOrderDto.Pieces;
             order.OrderPerson = updateOrderDto.OrderPerson;
+            order.ImageUrl = imagePath ?? order.ImageUrl;
             order.OrderAddress.PostalCode = updateOrderDto.UpdateOrderAddressDto.PostalCode ?? order.OrderAddress.PostalCode;
             order.OrderAddress.Street = updateOrderDto.UpdateOrderAddressDto.Street ?? order.OrderAddress.Street;
             order.OrderAddress.City = updateOrderDto.UpdateOrderAddressDto.City ?? order.OrderAddress.City;

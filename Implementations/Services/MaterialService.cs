@@ -14,7 +14,7 @@ public class MaterialService : IMaterialService
     }
     public async Task<BaseResponse> Create(CreateMaterialDto createMaterialDto)
     {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Material\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Materials\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
@@ -51,7 +51,7 @@ public class MaterialService : IMaterialService
     public async Task<BaseResponse> Update(int id, UpdateMaterialDto updateMaterialDto)
     {
         var updatedMaterial = await _repository.GetById(id);
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Material\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Materials\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

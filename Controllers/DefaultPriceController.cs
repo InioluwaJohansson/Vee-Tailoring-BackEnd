@@ -5,7 +5,7 @@ using Vee_Tailoring.Models.DTOs;
 
 namespace Vee_Tailoring.Controllers;
 
-[Route("V_Tailoring/[controller]")]
+[Route("Vee_Tailoring/[controller]")]
 [ApiController]
 public class DefaultPriceController : ControllerBase
 {
@@ -43,6 +43,18 @@ public class DefaultPriceController : ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var defaultPrice = await _defaultPriceService.GetById(id);
+        if (defaultPrice.Status == true)
+        {
+            return Ok(defaultPrice);
+        }
+        return BadRequest(defaultPrice);
+    }
+
+    // PUT : GetDefaultPriceById
+    [HttpPut("UpdatePrices")]
+    public async Task<IActionResult> SetPrices(int id, int updateId)
+    {
+        var defaultPrice = await _defaultPriceService.SetPrices(id, updateId);
         if (defaultPrice.Status == true)
         {
             return Ok(defaultPrice);

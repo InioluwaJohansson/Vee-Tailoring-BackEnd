@@ -14,7 +14,7 @@ public class PatternService : IPatternService
     }
     public async Task<BaseResponse> Create(CreatePatternDto createPatternDto)
     {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Pattern\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Patterns\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
@@ -53,7 +53,7 @@ public class PatternService : IPatternService
     public async Task<BaseResponse> Update(int id, UpdatePatternDto updatePatternDto)
     {
         var updatedPattern = await _repository.GetById(id);
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Pattern\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Patterns\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

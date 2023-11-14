@@ -319,9 +319,9 @@ public class PaymentService : IPaymentService
     }
     public async Task<InvoiceResponse> GenerateInvoice(int id)
     {
-        var invoice = await _repository.GenerateInvoice(id);
-        var getinvoice = await _repository.Get(c => c.Id == id);
-        if (invoice != null)
+        var getinvoice = await _repository.GenerateInvoice(id);
+        var invoiceOrders = await _orderRepo.GetByExpression(c => c.ReferenceNumber == getinvoice.ReferenceNumber);
+        if (getinvoice != null)
         {
             string path = "", fileName = $"{getinvoice.ReferenceNumber}.html";
             FileStream openPdf = new FileStream("../Templates/pdfTemplate.html", FileMode.Open, FileAccess.Read);
@@ -338,7 +338,7 @@ public class PaymentService : IPaymentService
             .Replace("$REGION", $"{getinvoice.Customer.UserDetails.Address.Region},")
             .Replace("$STATE", $"{getinvoice.Customer.UserDetails.Address.State},")
             .Replace("$COUNTRY", $"{getinvoice.Customer.UserDetails.Address.Country}.")
-            .Replace("$ITEMS", $"{InvoiceItems(invoice)}")
+            .Replace("$ITEMS", $"{InvoiceItems(invoiceOrders)}")
             ;
             var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Invoices\\");
             if (Directory.Exists($"{folderPath}{fileName}"))
@@ -373,12 +373,12 @@ public class PaymentService : IPaymentService
                     Country = getinvoice.Customer.UserDetails.Address.Country,
                     PostalCode = getinvoice.Customer.UserDetails.Address.PostalCode
                 },
-                GetOrderDto = invoice.Select(x => new GetOrderDto()
+                GetOrderDto = invoiceOrders.Select(x => new GetOrderDto()
                 {
                     Id = x.Id,
-                    OrderId = x.Order.OrderId,
-                    Pieces = x.Order.Pieces,
-                    Price = x.Order.Price
+                    OrderId = x.OrderId,
+                    Pieces = x.Pieces,
+                    Price = x.Price
                 }).ToList(),
             };
             return new InvoiceResponse()
@@ -395,12 +395,12 @@ public class PaymentService : IPaymentService
             Status = false
         };
     }
-    public string InvoiceItems(IList<Payment> payments)
+    public string InvoiceItems(IList<Order> orders)
     {
         var get = "";
-        foreach(var payment in payments)
+        foreach(var order in orders)
         {
-            get += $"<div><strong><span>{payment.Order.OrderId}</span> <span>{payment.Order.Price} <h6>X</h6 {payment.Order.Pieces}</span></strong></div>";
+            get += $"<div><strong><span>{order.OrderId}</span> <span>{order.Price} <h6>X</h6 {order.Pieces}</span></strong></div>";
         }
         return get;
     }

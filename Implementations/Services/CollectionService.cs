@@ -24,7 +24,7 @@ public class CollectionService : ICollectionService
     }
     public async Task<BaseResponse> Create(CreateCollectionDto createCollectionDto)
     {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Collection");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Collections\\");
         if (Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
@@ -64,7 +64,7 @@ public class CollectionService : ICollectionService
     public async Task<BaseResponse> Update(int id, UpdateCollectionDto updateCollectionDto)
     {
         var Collection = await _repository.GetById(id);
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Collection");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Collections\\");
         if (Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

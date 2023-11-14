@@ -10,19 +10,16 @@ namespace Vee_Tailoring.Payments;
 public class PaymentsHandler : IPaymentsHandler
 {
     IConfiguration _configuration;
-    HttpClient _httpClient;
-    HttpResponseMessage _response;
-    public PaymentsHandler(IConfiguration configuration, HttpClient httpClient, HttpResponseMessage response)
+    public PaymentsHandler(IConfiguration configuration)
     {
         _configuration = configuration;
-        _httpClient = httpClient;
-        _response = response;
     }
     public async Task<HttpStatusCode> PaystackPayment(PayStackPackage package)
     {
+        HttpClient _httpClient = new HttpClient();
+        HttpResponseMessage _response = new HttpResponseMessage();
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //HttpResponseMessage catchresponse = new HttpResponseMessage();
         var url = "https://api.paystack.co/transaction/initialize";
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["PayStack:ApiKey"]);
         var content = new StringContent(JsonSerializer.Serialize(new
@@ -39,9 +36,10 @@ public class PaymentsHandler : IPaymentsHandler
     }
     public async Task<HttpStatusCode> VisaPayment(Card card, decimal amount)
     {
+        HttpClient _httpClient = new HttpClient();
+        HttpResponseMessage _response = new HttpResponseMessage();
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        //HttpResponseMessage catchresponse = new HttpResponseMessage();
         _httpClient.DefaultRequestHeaders.Add("X-ApiKey", _configuration["Visa:ApiKey"]);
         _httpClient.DefaultRequestHeaders.Add("X-ApiSecret", _configuration["Visa:ApiSecret"]);
         var content = new StringContent(JsonSerializer.Serialize(new

@@ -13,11 +13,13 @@ public class TokenService : ITokenService
     ITokenRepo _repository;
     IUserRepo _userRepo;
     IEmailSend _email;
-    public TokenService(ITokenRepo repository, IUserRepo userRepo, IEmailSend email)
+    IConfiguration _configuration;
+    public TokenService(ITokenRepo repository, IUserRepo userRepo, IEmailSend email, IConfiguration configuration)
     {
         _repository = repository;
         _userRepo = userRepo;
         _email = email;
+        _configuration = configuration;
     }
     public async Task<bool> GenerateToken(int id, TokenType tokenType)
     {
@@ -43,12 +45,12 @@ public class TokenService : ITokenService
             await _repository.Create(token);
             var sendEmail = new CreateEmailDto()
             {
-                Subject = $"V Tailoring: {tokenType.ToString()} Token",
+                Subject = $"{_configuration["ApplicationDetails:AppName"]}: {tokenType.ToString()} Token",
                 ReceiverName = $"{user.UserName}",
                 ReceiverEmail = user.Email,
                 Message = $"{tokenType.ToString()} Token Generated! /n" +
                 $"Use the token below to initiate your recent {tokenType.ToString()}. /n" +
-                $"Token: {generateToken} /n" + "This token expires in 3 minutes. /n" + "Vee Tailoring"
+                $"Token: {generateToken} /n" + "This token expires in 3 minutes. /n" + $"{_configuration["ApplicationDetails:AppName"]}"
             };
             await _email.SendMail(sendEmail);
             return true;
@@ -68,7 +70,7 @@ public class TokenService : ITokenService
     }
     public async Task<string> CheckTokenStatus(string TokenNo, TokenType tokenType)
     {
-        var tokens = await _repository.GetByExpression(x => x.IsDeleted == false && x.TokenType ==tokenType);
+        var tokens = await _repository.GetByExpression(x => x.IsDeleted == false && x.TokenType == tokenType);
         var status = false;
         if(tokens != null)
         {
@@ -96,5 +98,22 @@ public class TokenService : ITokenService
             return TokenNo;
         }
         return null;
+    }
+    public async Task<int> RefreshToken()
+    {
+        var tokens = await _repository.GetByExpression(x => x.IsDeleted == false);
+        if (tokens != null)
+        {
+            foreach (var token in tokens)
+            {
+                if (token.TokenStartTime < DateTime.Now && DateTime.Now >= token.TokenEndTime)
+                {
+                    token.IsDeleted = true;
+                    await _repository.Update(token);
+                }
+            }
+        }
+        await RefreshToken();
+        return 0;
     }
 }
