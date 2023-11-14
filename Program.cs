@@ -10,6 +10,7 @@ using Vee_Tailoring.Context;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Vee_Tailoring;
+using Vee_Tailoring.Payments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IRoleRepo, RoleRepo>();
 builder.Services.AddScoped<IStyleRepo, StyleRepo>();
 builder.Services.AddScoped<IStaffRepo, StaffRepo>();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IEmailRepo, EmailRepo>();
 builder.Services.AddScoped<ITemplateRepo, TemplateRepo>();
 builder.Services.AddScoped<ITokenRepo, TokenRepo>();
 builder.Services.AddScoped<IArmTypeService, ArmTypeService>();
@@ -58,9 +60,11 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IStaffService, StaffService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IEmailSend, EmailSender>();
+builder.Services.AddScoped<IPaymentsHandler, PaymentsHandler>();
 builder.Services.AddHostedService<VBackgroundService>();
 builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("TailoringContext");

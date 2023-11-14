@@ -5,7 +5,7 @@ using Vee_Tailoring.Models.DTOs;
 
 namespace Vee_Tailoring.Controllers;
 
-[Route("V_Tailoring/[controller]")]
+[Route("Vee_Tailoring/[controller]")]
 [ApiController]
 public class CommentController : ControllerBase
 {

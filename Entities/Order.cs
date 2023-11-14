@@ -29,6 +29,7 @@ public class Order: AuditableEntity
     public Staff Staff { get; set; }
     public int StaffId { get; set; }
     public string OtherDetails { get; set; }
+    public string ImageUrl { get; set; }
     public string ReferenceNumber { get; set; } = "";
     public DateTime CompletionTime { get; set; }
     public IsCompleted IsCompleted { get; set; }

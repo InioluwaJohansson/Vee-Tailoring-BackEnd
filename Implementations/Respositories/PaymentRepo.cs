@@ -12,8 +12,8 @@ public class PaymentRepo : BaseRepository<Payment>, IPaymentRepo
     {
         context = _context;
     }
-    public async Task<IList<Payment>> GenerateInvoice(int id)
+    public async Task<Payment> GenerateInvoice(int id)
     {
-        return await context.Payment.Include(c => c.Customer).Include(c => c.Customer.User).Include(c => c.Customer.UserDetails).Include(c => c.Customer.UserDetails.Address).Include(c => c.Order).Where(c => c.Id == id && c.ReferenceNumber == c.Order.ReferenceNumber && c.IsDeleted == false).ToListAsync();
+        return await context.Payment.Include(c => c.Customer).Include(c => c.Customer.User).Include(c => c.Customer.UserDetails).Include(c => c.Customer.UserDetails.Address).Include(c => c.Order).FirstOrDefaultAsync(c => c.Id == id && c.IsDeleted == false);
     }
 }

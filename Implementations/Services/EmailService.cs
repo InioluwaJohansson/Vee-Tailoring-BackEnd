@@ -25,38 +25,36 @@ public class EmailService : IEmailService
 
     public async Task<BaseResponse> Create(CreateEmailDto createEmailDto)
     {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Email Attachments\\");
-        if (!System.IO.Directory.Exists(folderPath))
-        {
-            Directory.CreateDirectory(folderPath);
-        }
         var imagePath = "";
-        if (createEmailDto.Attachment != null)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(createEmailDto.Attachment.FileName);
-            var filePath = Path.Combine(folderPath, createEmailDto.Attachment.FileName);
-            var extension = Path.GetExtension(createEmailDto.Attachment.FileName);
-            if (!System.IO.Directory.Exists(filePath))
+        if(createEmailDto.Attachment != null){
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Email Attachments\\");
+            if (!System.IO.Directory.Exists(folderPath))
             {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await createEmailDto.Attachment.CopyToAsync(stream);
-                }
-                imagePath = fileName;
+                Directory.CreateDirectory(folderPath);
             }
+            if (createEmailDto.Attachment != null)
+            {
+                var fileName = Path.GetFileNameWithoutExtension(createEmailDto.Attachment.FileName);
+                var filePath = Path.Combine(folderPath, createEmailDto.Attachment.FileName);
+                var extension = Path.GetExtension(createEmailDto.Attachment.FileName);
+                if (!System.IO.Directory.Exists(filePath))
+                {
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await createEmailDto.Attachment.CopyToAsync(stream);
+                    }
+                    imagePath = filePath;
+                }
+            }
+            createEmailDto.AttachmentUrl = imagePath;
         }
-        else
-        {
-            imagePath = null;
-        }
-        createEmailDto.AttachmentUrl = imagePath;
         var email = new Email()
         {
             Subject = createEmailDto.Subject,
             Message = createEmailDto.Message,
             StaffId = createEmailDto.StaffId,
             EmailType = createEmailDto.emailType,
-            AttachmentUrl = imagePath
+            AttachmentUrl = "" ?? imagePath
         };
         if(createEmailDto.emailType == EmailType.Single)
         {

@@ -6,7 +6,7 @@ using Vee_Tailoring.Models.Enums;
 
 namespace Vee_Tailoring.Controllers;
 
-[Route("V_Tailoring/[controller]")]
+[Route("Vee_Tailoring/[controller]")]
 [ApiController]
 public class PaymentController : ControllerBase
 {
@@ -72,8 +72,8 @@ public class PaymentController : ControllerBase
         return BadRequest(payment);
     }
     // PUT : Updatepayment
-    [HttpPut("VerifyPaymentByCustomerUserId")]
-    public async Task<IActionResult> VerifyPaymentByCustomerUserID(int id, string referenceNo)
+    [HttpGet("VerifyPaymentByCustomerUserId")]
+    public async Task<IActionResult> VerifyPaymentByCustomerUserId(int id, string referenceNo)
     {
         var payment = await _paymentService.VerifyPaymentByCustomer(id, referenceNo);
         if (payment.Status == true)
@@ -96,7 +96,7 @@ public class PaymentController : ControllerBase
     }
 
     // GET : GetAllpaymentsByDateRange
-    [HttpGet("GetAllPayments")]
+    [HttpGet("GetAllPaymentsDateRange")]
     public async Task<IActionResult> GetAllPaymentsGetAllPaymentsDateRange(DateTime startDate, DateTime endDate)
     {
         var payment = await _paymentService.GetAllPaymentsDateRange(startDate, endDate);

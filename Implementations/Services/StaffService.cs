@@ -16,13 +16,15 @@ public class StaffService : IStaffService
     IRoleRepo _rolerepository;
     IOrderRepo _orderRepo;
     IEmailSend _emailSend;
-    public StaffService(IStaffRepo repository, IUserRepo userrepository, IRoleRepo rolerepository, IOrderRepo orderRepo, IEmailSend emailSend)
+    IConfiguration _configuration;
+    public StaffService(IStaffRepo repository, IUserRepo userrepository, IRoleRepo rolerepository, IOrderRepo orderRepo, IEmailSend emailSend, IConfiguration configuration)
     {
         _repository = repository;
         _userrepository = userrepository;
         _rolerepository = rolerepository;
         _orderRepo = orderRepo;
         _emailSend = emailSend;
+        _configuration = configuration;
     }
     public async Task<BaseResponse> Create(CreateStaffDto createStaffDto)
     {
@@ -82,13 +84,13 @@ public class StaffService : IStaffService
             await _repository.Create(staff);
             var email = new CreateEmailDto()
             {
-                Subject = "V Tailoring Staff Account Registered Successfully",
+                Subject = $"{_configuration["ApplicationDetails:AppName"]} Staff Account Registered Successfully",
                 ReceiverName = $"{createStaffDto.LastName} {createStaffDto.FirstName}",
                 ReceiverEmail = createStaffDto.Email,
                 Message = $"Hi {createStaffDto.FirstName}, /n" +
                 $"Thanks for joining us. We hope you gain valueable experience with us as you aim to acheve your full potential. /n" +
                 $"You've been assigned as a {role.Name}. /n" +
-                $"Signed: Vee Management" +
+                $"Signed: {_configuration["ApplicationDetails:AppName"]} Management. /n" +
                 $"Login to finish setting up your profile."
             };
             var response = await _emailSend.SendMail(email);

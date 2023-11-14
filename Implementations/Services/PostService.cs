@@ -18,7 +18,7 @@ public class PostService : IPostService
     }
     public async Task<BaseResponse> Create(CreatePostDto createPostDto)
     {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Post\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Posts\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
@@ -58,7 +58,7 @@ public class PostService : IPostService
     public async Task<BaseResponse> Update(int id, UpdatePostDto updatePostDto)
     {
         var post = await _repository.GetById(id);
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Post\\");
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\Images\\Posts\\");
         if (!System.IO.Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);

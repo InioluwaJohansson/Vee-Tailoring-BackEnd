@@ -73,7 +73,7 @@ public class ArmTypeService : IArmTypeService
         return new ArmTypeResponseModel()
         {
             Data = null,
-            Message = "Arm Length Found",
+            Message = "No Arm Length Found",
             Status = true
         };
     }
@@ -91,7 +91,7 @@ public class ArmTypeService : IArmTypeService
         return new ArmTypesResponseModel()
         {
             Data = null,
-            Message = "No ArmTypes",
+            Message = "No ArmTypes Found",
             Status = false
         };
     }
